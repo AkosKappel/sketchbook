@@ -3,35 +3,31 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Genetic Algorithm</title>
-    <link href="style.css" rel="stylesheet" />
-    <script src="../lib/p5.min.js"></script>
-    <script src="Brain.js"></script>
-    <script src="Dot.js"></script>
-    <script src="Population.js"></script>
-    <script src="Goal.js"></script>
-    <script src="Obstacle.js"></script>
-    <script src="sketch.js"></script>
+    <title>Genetic Algorithm · Mini Projects</title>
+    <link rel="icon" href="../shared/favicon.svg" />
+    <link rel="stylesheet" href="../shared/base.css" />
+    <script defer src="../lib/p5.min.js"></script>
+    <script defer src="../shared/fit-canvas.js"></script>
+    <script defer src="Brain.js"></script>
+    <script defer src="Dot.js"></script>
+    <script defer src="Population.js"></script>
+    <script defer src="Goal.js"></script>
+    <script defer src="Obstacle.js"></script>
+    <script defer src="sketch.js"></script>
   </head>
-  <body>
-    <div class="card">
-      <div class="card-body">
-        <div>
-          <p id="population-size">Population size:</p>
-          <p id="generation-count">Generation:</p>
-          <p id="steps-count">Minimal steps:</p>
-        </div>
-        <div id="slider-holder">
-          Speed:
-          <!-- speed slider goes here -->
-        </div>
-      </div>
-      <div>
-        <h1>Genetic algorithm</h1>
-        <div id="canvas-holder">
-          <!-- canvas goes here -->
-        </div>
-      </div>
+  <body class="project">
+    <header class="topbar">
+      <a class="back" href="../">← All projects</a>
+      <h1>Genetic Algorithm</h1>
+      <span class="stat">Generation <output id="generation">1</output></span>
+      <span class="stat">Population <output id="population">0</output></span>
+      <span class="stat">Best <output id="best">not reached yet</output></span>
+      <p class="hint">Each generation breeds from the dots that got closest, until they find a path to the red goal</p>
+    </header>
+    <main class="stage padded"></main>
+    <div class="controls">
+      <label>Speed <input type="range" id="speed" min="1" max="25" value="1" /></label>
+      <button id="restart">Restart</button>
     </div>
   </body>
 </html>

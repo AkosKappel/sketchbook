@@ -1,12 +1,14 @@
 class Goal {
-  constructor(w, h, r) {
-    this.pos = createVector(w, h);
+  constructor(x, y, r) {
+    this.pos = createVector(x, y);
     this.r = r;
-    this.color = color(255, 0, 0);
   }
 
   show() {
-    fill(this.color);
-    ellipse(this.pos.x, this.pos.y, this.r, this.r);
+    noStroke();
+    fill(255, 92, 108, 50);
+    circle(this.pos.x, this.pos.y, this.r * 4);
+    fill(255, 92, 108);
+    circle(this.pos.x, this.pos.y, this.r * 2);
   }
 }
