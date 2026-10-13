@@ -1,132 +1,141 @@
-const cellSize = 30;
-let cells;
-let drawingState;
-let isRunning;
+const cellSize = 18;
+let cols;
+let rows;
+let cells; // one byte per cell, 1 = alive, row by row
+let generation = 0;
+let playing = true;
+let lastStep = 0;
+let paintValue = null; // what a drag paints: 1 to draw, 0 to erase, null when not drawing
 
-const STATE = {
-  alive: 1,
-  dead: 0,
-};
-
-function make2DArray() {
-  return Array(floor(height / cellSize))
-    .fill()
-    .map(() => Array(floor(width / cellSize)).fill(STATE.dead));
-}
+const playButton = document.getElementById('play');
+const speedInput = document.getElementById('speed');
+const generationOutput = document.getElementById('generation');
+const aliveOutput = document.getElementById('alive');
 
 function setup() {
-  // initialize window
-  createCanvas(1500, 900).parent('canvas-container');
-  document.getElementById('start-btn').addEventListener('click', () => (isRunning = true));
-  document.getElementById('stop-btn').addEventListener('click', () => (isRunning = false));
+  const stage = document.querySelector('.stage');
+  cols = max(8, floor((stage.clientWidth - 32) / cellSize));
+  rows = max(8, floor((stage.clientHeight - 32) / cellSize));
+  const canvas = createCanvas(cols * cellSize, rows * cellSize).parent(stage);
 
-  // initialize game
-  frameRate(10);
-  cells = make2DArray();
-  isRunning = false;
+  randomize();
+  setupDrawing(canvas.elt);
+
+  playButton.addEventListener('click', togglePlay);
+  document.getElementById('step').addEventListener('click', () => {
+    setPlaying(false);
+    step();
+  });
+  document.getElementById('random').addEventListener('click', randomize);
+  document.getElementById('clear').addEventListener('click', () => {
+    setPlaying(false);
+    cells.fill(0);
+    generation = 0;
+    updateStats();
+  });
+  document.addEventListener('keydown', (event) => {
+    // a focused button already reacts to Space, toggling here as well would undo it
+    if (event.key !== ' ' || event.target.closest('button, input')) return;
+    event.preventDefault();
+    togglePlay();
+  });
 }
 
 function draw() {
-  // background(255);
-  showCells();
-
-  if (isRunning) {
-    run();
+  const interval = 1000 / Number(speedInput.value);
+  if (playing && paintValue === null && millis() - lastStep >= interval) {
+    lastStep = millis();
+    step();
   }
-}
 
-function run() {
-  let newCells = make2DArray();
+  background(16, 20, 28);
+  stroke(255, 255, 255, 12);
+  strokeWeight(1);
+  for (let x = 1; x < cols; x++) line(x * cellSize, 0, x * cellSize, height);
+  for (let y = 1; y < rows; y++) line(0, y * cellSize, width, y * cellSize);
 
-  for (let i = 0; i < cells.length; i++) {
-    for (let j = 0; j < cells[i].length; j++) {
-      let neighours = countNeighbours(i, j);
-
-      // if (i - 1 >= 0 && cells[i - 1][j] === STATE.alive) neighours++; // top
-      // if (i + 1 < cells.length && cells[i + 1][j] === STATE.alive) neighours++; // bottom
-      // if (j - 1 >= 0 && cells[i][j - 1] === STATE.alive) neighours++; // left
-      // if (j + 1 < cells[0].length && cells[i][j + 1] === STATE.alive) neighours++; // right
-      // if (i - 1 >= 0 && j - 1 >= 0 && cells[i - 1][j - 1] === STATE.alive) neighours++; // top-left
-      // if (i - 1 >= 0 && j + 1 < cells[0].length && cells[i - 1][j + 1] === STATE.alive) neighours++; // top-right
-      // if (i + 1 < cells.length && j - 1 >= 0 && cells[i + 1][j - 1] === STATE.alive) neighours++; // bottom-left
-      // if (i + 1 < cells.length && j + 1 < cells[0].length && cells[i + 1][j + 1] === STATE.alive) neighours++; // bottom-right
-
-      if (cells[i][j] === STATE.alive && 2 <= neighours && neighours <= 3) {
-        newCells[i][j] = STATE.alive;
-      } else if (cells[i][j] === STATE.dead && neighours === 3) {
-        newCells[i][j] = STATE.alive;
-      } else {
-        newCells[i][j] = STATE.dead;
-      }
+  noStroke();
+  fill(94, 230, 160);
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      if (cells[y * cols + x]) rect(x * cellSize + 1, y * cellSize + 1, cellSize - 2, cellSize - 2, 3);
     }
   }
-
-  cells = newCells;
 }
 
-function countNeighbours(y, x) {
+function step() {
+  const next = new Uint8Array(cells.length);
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      const neighbours = countNeighbours(x, y);
+      const alive = cells[y * cols + x];
+      next[y * cols + x] = neighbours === 3 || (alive && neighbours === 2) ? 1 : 0;
+    }
+  }
+  cells = next;
+  generation++;
+  updateStats();
+}
+
+// the edges wrap around, so the grid behaves like the surface of a torus
+function countNeighbours(x, y) {
   let count = 0;
-  let nRows = cells.length;
-  let nCols = cells[0].length;
-
-  for (let i = -1; i < 2; i++) {
-    for (let j = -1; j < 2; j++) {
-      let row = (y + i + nRows) % nRows;
-      let col = (x + j + nCols) % nCols;
-      if (cells[row][col] === STATE.alive) count++;
+  for (let dy = -1; dy <= 1; dy++) {
+    for (let dx = -1; dx <= 1; dx++) {
+      if (dx === 0 && dy === 0) continue;
+      const row = (y + dy + rows) % rows;
+      const col = (x + dx + cols) % cols;
+      count += cells[row * cols + col];
     }
   }
-
-  if (cells[y][x] === STATE.alive) count--;
   return count;
 }
 
-function showCells() {
-  // stroke(0, 100);
-  // // vertical lines
-  // for (let i = 1; i < grid.length; i++) {
-  //   line(i * cellSize, 0, i * cellSize, height);
-  // }
-  // // horizontal lines
-  // for (let i = 1; i < grid[0].length; i++) {
-  //   line(0, i * cellSize, width, i * cellSize);
-  // }
-
-  for (let y = 0; y < cells.length; y++) {
-    for (let x = 0; x < cells[y].length; x++) {
-      if (cells[y][x] === STATE.alive) {
-        // dead cells are white
-        fill(0);
-      } else if (cells[y][x] === STATE.dead) {
-        // alive cells are black
-        fill(255);
-      }
-      rect(cellSize * x, cellSize * y, cellSize, cellSize);
-    }
-  }
+function randomize() {
+  cells = Uint8Array.from({ length: cols * rows }, () => (random() < 0.25 ? 1 : 0));
+  generation = 0;
+  updateStats();
 }
 
-// changes the selected cell's state
-function mousePressed() {
-  if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
-    let x = floor(mouseX / cellSize);
-    let y = floor(mouseY / cellSize);
-
-    if (cells[y][x] === STATE.dead) {
-      drawingState = STATE.alive;
-    } else if (cells[y][x] === STATE.alive) {
-      drawingState = STATE.dead;
-    }
-    cells[y][x] = drawingState;
-  }
+function updateStats() {
+  generationOutput.value = generation;
+  aliveOutput.value = cells.reduce((sum, cell) => sum + cell, 0);
 }
 
-// enables changing the state for multiple cells by dragging the mouse
-function mouseDragged() {
-  if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
-    let x = floor(mouseX / cellSize);
-    let y = floor(mouseY / cellSize);
+function togglePlay() {
+  setPlaying(!playing);
+}
 
-    cells[y][x] = drawingState;
-  }
+function setPlaying(value) {
+  playing = value;
+  playButton.textContent = playing ? 'Pause' : 'Play';
+}
+
+function setupDrawing(canvas) {
+  const cellAt = (event) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = floor(((event.clientX - rect.left) / rect.width) * cols);
+    const y = floor(((event.clientY - rect.top) / rect.height) * rows);
+    return x >= 0 && x < cols && y >= 0 && y < rows ? y * cols + x : -1;
+  };
+
+  canvas.addEventListener('pointerdown', (event) => {
+    const index = cellAt(event);
+    if (index < 0) return;
+    canvas.setPointerCapture(event.pointerId);
+    // starting on a live cell erases, starting on an empty one draws
+    paintValue = cells[index] ? 0 : 1;
+    cells[index] = paintValue;
+    updateStats();
+  });
+  canvas.addEventListener('pointermove', (event) => {
+    if (paintValue === null) return;
+    const index = cellAt(event);
+    if (index < 0 || cells[index] === paintValue) return;
+    cells[index] = paintValue;
+    updateStats();
+  });
+  const stopDrawing = () => (paintValue = null);
+  canvas.addEventListener('pointerup', stopDrawing);
+  canvas.addEventListener('pointercancel', stopDrawing);
 }

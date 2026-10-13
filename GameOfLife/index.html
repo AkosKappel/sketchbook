@@ -3,20 +3,27 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Game of Life</title>
-    <link href="style.css" rel="stylesheet" />
-    <script src="../lib/p5.min.js"></script>
-    <script src="sketch.js"></script>
+    <title>Game of Life · Mini Projects</title>
+    <link rel="icon" href="../shared/favicon.svg" />
+    <link rel="stylesheet" href="../shared/base.css" />
+    <script defer src="../lib/p5.min.js"></script>
+    <script defer src="sketch.js"></script>
   </head>
-  <body>
-    <div class="wrapper">
-      <div id="childWrapper">
-        <button id="start-btn">Start</button><br />
-        <button id="stop-btn">Stop</button><br />
-      </div>
-      <div id="canvas-container">
-        <!-- canvas goes here -->
-      </div>
+  <body class="project">
+    <header class="topbar">
+      <a class="back" href="../">← All projects</a>
+      <h1>Game of Life</h1>
+      <span class="stat">Generation <output id="generation">0</output></span>
+      <span class="stat">Alive <output id="alive">0</output></span>
+      <p class="hint">Click or drag to draw cells, <kbd>Space</kbd> to play or pause</p>
+    </header>
+    <main class="stage padded"></main>
+    <div class="controls">
+      <button class="primary" id="play">Pause</button>
+      <button id="step">Step</button>
+      <button id="random">Random</button>
+      <button id="clear">Clear</button>
+      <label>Speed <input type="range" id="speed" min="1" max="30" value="10" /></label>
     </div>
   </body>
 </html>
