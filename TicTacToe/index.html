@@ -3,24 +3,35 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tic Tac Toe</title>
-    <link href="style.css" rel="stylesheet" />
-    <script src="../lib/p5.min.js"></script>
-    <script src="app.js"></script>
-    <script src="sketch.js"></script>
+    <title>Tic Tac Toe · Mini Projects</title>
+    <link rel="icon" href="../shared/favicon.svg" />
+    <link rel="stylesheet" href="../shared/base.css" />
+    <script defer src="../lib/p5.min.js"></script>
+    <script defer src="../shared/fit-canvas.js"></script>
+    <script defer src="app.js"></script>
+    <script defer src="sketch.js"></script>
   </head>
-  <body>
-    <h1>Tic Tac Toe</h1>
-    <div id="sketch-holder">
-      <!-- canvas goes here -->
-    </div>
-    <select id="difficulty" name="difficulty">
-      <option value="easy">easy</option>
-      <option value="medium" selected>medium</option>
-      <option value="hard">hard</option>
-    </select>
-    <br />
-    <button id="reset-btn" type="button">Play again</button>
-    <p id="game-result"></p>
+  <body class="project">
+    <header class="topbar">
+      <a class="back" href="../">← All projects</a>
+      <h1>Tic Tac Toe</h1>
+      <span class="stat">Wins <output id="wins">0</output></span>
+      <span class="stat">Losses <output id="losses">0</output></span>
+      <span class="stat">Draws <output id="draws">0</output></span>
+      <p class="hint">You play X, click or tap a square</p>
+    </header>
+    <main class="stage padded"></main>
+    <footer class="controls">
+      <span class="stat"><strong id="status" aria-live="polite">Your turn</strong></span>
+      <label>
+        Difficulty
+        <select id="difficulty">
+          <option value="easy">Easy</option>
+          <option value="medium" selected>Medium</option>
+          <option value="hard">Hard</option>
+        </select>
+      </label>
+      <button class="primary" id="new-game" type="button">New game</button>
+    </footer>
   </body>
 </html>
