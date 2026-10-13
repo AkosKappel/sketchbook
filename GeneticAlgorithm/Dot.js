@@ -13,10 +13,10 @@ class Dot {
     noStroke();
     if (this.isBest) {
       fill(245, 185, 66);
-      circle(this.pos.x, this.pos.y, 10);
+      circle(this.pos.x, this.pos.y, 14);
     } else {
-      fill(154, 163, 181, 170);
-      circle(this.pos.x, this.pos.y, 5);
+      fill(232, 235, 242, 170);
+      circle(this.pos.x, this.pos.y, 8);
     }
   }
 
