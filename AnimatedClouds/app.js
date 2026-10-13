@@ -1,6 +1,5 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
-const stage = canvas.parentElement;
 
 const colors = ['#ffffff', 'rgb(255 255 255 / 0.3)', 'rgb(173 216 230 / 0.8)', 'rgb(211 211 211 / 0.8)'];
 const maxSize = 40;
@@ -50,16 +49,9 @@ class Particle {
   }
 }
 
-function resize() {
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  width = stage.clientWidth;
-  height = stage.clientHeight;
-  canvas.width = Math.round(width * dpr);
-  canvas.height = Math.round(height * dpr);
-  canvas.style.width = `${width}px`;
-  canvas.style.height = `${height}px`;
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
+function resize(stageWidth, stageHeight) {
+  width = stageWidth;
+  height = stageHeight;
   sky = ctx.createLinearGradient(0, 0, 0, height);
   sky.addColorStop(0, '#0b0d12');
   sky.addColorStop(1, '#1f3354');
@@ -92,5 +84,5 @@ canvas.addEventListener('pointerleave', () => {
   pointer.active = false;
 });
 
-new ResizeObserver(resize).observe(stage);
+fillStage(canvas, resize);
 requestAnimationFrame(animate);

@@ -1,10 +1,5 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
-const stage = canvas.parentElement;
-const hint = document.getElementById('hint');
-const defaultHint = hint.textContent;
-const fileInput = document.getElementById('image-file');
-const resetButton = document.getElementById('reset-image');
 
 const maxScale = 4;
 // Larger images are downscaled to this many particles along their longest side to keep the frame rate up.
@@ -79,15 +74,6 @@ function sampleImage(image) {
 }
 
 function layout() {
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  width = stage.clientWidth;
-  height = stage.clientHeight;
-  canvas.width = Math.round(width * dpr);
-  canvas.height = Math.round(height * dpr);
-  canvas.style.width = `${width}px`;
-  canvas.style.height = `${height}px`;
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
   scale = Math.min(maxScale, (width * 0.9) / grid.width, (height * 0.85) / grid.height);
   const left = (width - grid.width * scale) / 2;
   const top = (height - grid.height * scale) / 2;
@@ -111,56 +97,19 @@ function trackPointer(event) {
   pointer.active = true;
 }
 
-async function loadImage(src) {
-  const image = new Image();
-  image.src = src;
-  await image.decode();
-  return image;
-}
-
-async function useImage(src, isDefault) {
-  try {
-    grid = sampleImage(await loadImage(src));
-    layout();
-    hint.textContent = defaultHint;
-    resetButton.hidden = isDefault;
-  } catch {
-    hint.textContent = 'That image could not be loaded. Try a JPEG, PNG or WebP file.';
-  }
-}
-
-async function useFile(file) {
-  if (!file) return;
-  if (!file.type.startsWith('image/')) {
-    hint.textContent = 'That file is not an image.';
-    return;
-  }
-  const url = URL.createObjectURL(file);
-  await useImage(url, false);
-  URL.revokeObjectURL(url);
-}
-
 canvas.addEventListener('pointermove', trackPointer);
 canvas.addEventListener('pointerdown', trackPointer);
 canvas.addEventListener('pointerleave', () => {
   pointer.active = false;
 });
 
-document.getElementById('pick-image').addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', () => {
-  useFile(fileInput.files[0]);
-  // Clearing lets the same file be picked again after a reset.
-  fileInput.value = '';
+fillStage(canvas, (stageWidth, stageHeight) => {
+  width = stageWidth;
+  height = stageHeight;
+  layout();
 });
-resetButton.addEventListener('click', () => useImage('vault-boy.png', true));
-
-// Listening on the whole page also stops a missed drop from navigating away to the file.
-document.addEventListener('dragover', (event) => event.preventDefault());
-document.addEventListener('drop', (event) => {
-  event.preventDefault();
-  useFile(event.dataTransfer.files[0]);
+setupImageInput('vault-boy.png', (image) => {
+  grid = sampleImage(image);
+  layout();
 });
-
-new ResizeObserver(layout).observe(stage);
-useImage('vault-boy.png', true);
 requestAnimationFrame(animate);

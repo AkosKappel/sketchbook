@@ -19,7 +19,7 @@ Plain HTML, CSS and JavaScript with no build step. The p5.js projects use a vend
 
 ```
 index.html          landing page
-shared/             base stylesheet, canvas fitting helper, favicon
+shared/             base stylesheet, canvas sizing and image input helpers, favicon
 lib/p5.min.js       p5.js 1.11.13
 thumbs/             landing page previews
 <Project>/          one folder per project, opened via <Project>/index.html

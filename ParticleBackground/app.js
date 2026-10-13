@@ -1,6 +1,5 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
-const stage = canvas.parentElement;
 
 const connectDistance = 120;
 const maxParticles = 160;
@@ -64,16 +63,9 @@ function connect() {
   }
 }
 
-function resize() {
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  width = stage.clientWidth;
-  height = stage.clientHeight;
-  canvas.width = Math.round(width * dpr);
-  canvas.height = Math.round(height * dpr);
-  canvas.style.width = `${width}px`;
-  canvas.style.height = `${height}px`;
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
+function resize(stageWidth, stageHeight) {
+  width = stageWidth;
+  height = stageHeight;
   pointer.radius = Math.max(80, Math.min(width, height) / 5);
   const count = Math.min(Math.round((width * height) / 9000), maxParticles);
   particles = Array.from({ length: count }, () => new Particle());
@@ -100,5 +92,5 @@ canvas.addEventListener('pointerleave', () => {
   pointer.active = false;
 });
 
-new ResizeObserver(resize).observe(stage);
+fillStage(canvas, resize);
 requestAnimationFrame(animate);

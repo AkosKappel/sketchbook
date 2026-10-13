@@ -1,6 +1,5 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
-const stage = canvas.parentElement;
 let width = 0;
 let height = 0;
 
@@ -45,17 +44,11 @@ function generateTree() {
   ctx.restore();
 }
 
-function resize() {
-  const dpr = window.devicePixelRatio || 1;
-  width = stage.clientWidth;
-  height = stage.clientHeight;
-  canvas.width = Math.round(width * dpr);
-  canvas.height = Math.round(height * dpr);
-  canvas.style.width = `${width}px`;
-  canvas.style.height = `${height}px`;
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+function resize(stageWidth, stageHeight) {
+  width = stageWidth;
+  height = stageHeight;
   generateTree();
 }
 
 document.getElementById('generate').addEventListener('click', generateTree);
-new ResizeObserver(resize).observe(stage);
+fillStage(canvas, resize);

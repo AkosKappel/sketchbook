@@ -1,6 +1,5 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
-const stage = canvas.parentElement;
 
 const ringCount = 100;
 const speed = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0.3 : 1;
@@ -31,15 +30,9 @@ class Ring {
   }
 }
 
-function resize() {
-  const dpr = window.devicePixelRatio || 1;
-  width = stage.clientWidth;
-  height = stage.clientHeight;
-  canvas.width = Math.round(width * dpr);
-  canvas.height = Math.round(height * dpr);
-  canvas.style.width = `${width}px`;
-  canvas.style.height = `${height}px`;
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+function resize(stageWidth, stageHeight) {
+  width = stageWidth;
+  height = stageHeight;
   rings = Array.from({ length: ringCount }, () => new Ring());
 }
 
@@ -54,5 +47,5 @@ function animate() {
   requestAnimationFrame(animate);
 }
 
-new ResizeObserver(resize).observe(stage);
+fillStage(canvas, resize);
 requestAnimationFrame(animate);

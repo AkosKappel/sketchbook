@@ -12,3 +12,21 @@ function fitCanvas(canvas, width, height) {
   };
   new ResizeObserver(fit).observe(stage);
 }
+
+// Sizes a Canvas 2D canvas to fill its stage, sharp on HiDPI screens, and calls onResize(width, height)
+// in CSS pixels after every stage resize. Drawing code then works in CSS pixels.
+function fillStage(canvas, onResize) {
+  const ctx = canvas.getContext('2d');
+  const stage = canvas.parentElement;
+  new ResizeObserver(() => {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const width = stage.clientWidth;
+    const height = stage.clientHeight;
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    onResize(width, height);
+  }).observe(stage);
+}
