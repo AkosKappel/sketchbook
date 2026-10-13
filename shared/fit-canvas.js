@@ -10,6 +10,8 @@ function fitCanvas(canvas, width, height) {
     canvas.style.width = `${width * scale}px`;
     canvas.style.height = `${height * scale}px`;
   };
+  // fitting right away, not only when the observer first fires, keeps the canvas from jumping on load
+  fit();
   new ResizeObserver(fit).observe(stage);
 }
 

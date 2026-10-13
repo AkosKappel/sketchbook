@@ -237,3 +237,8 @@ input[type='checkbox'] {
     margin: 0;
   }
 }
+
+/* Canvas sizing scripts set an inline size; until then the canvas stays hidden so it doesn't jump on load */
+.stage canvas:not([style]) {
+  visibility: hidden;
+}
