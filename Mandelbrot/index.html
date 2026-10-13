@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mandelbrot · SketchBook</title>
+    <meta name="description" content="Zoom into the Mandelbrot set, an endlessly detailed fractal from one line of math." />
+    <link rel="icon" href="../shared/favicon.svg" />
+    <link rel="stylesheet" href="../shared/base.css" />
+    <script defer src="../shared/fit-canvas.js"></script>
+    <script defer src="app.js"></script>
+  </head>
+  <body class="project">
+    <header class="topbar">
+      <a class="back" href="../">← All projects</a>
+      <h1>Mandelbrot</h1>
+      <span class="stat">Zoom <output id="zoom">1×</output></span>
+      <p class="hint" id="hint">Click or tap to zoom in, drag to move, scroll to zoom in and out</p>
+    </header>
+    <main class="stage">
+      <canvas id="canvas"></canvas>
+    </main>
+    <div class="controls">
+      <label>
+        Colors
+        <select id="palette">
+          <option value="ember">Ember</option>
+          <option value="ocean">Ocean</option>
+          <option value="rainbow">Rainbow</option>
+        </select>
+      </label>
+      <label>Detail <input type="range" id="iterations" min="100" max="3000" step="100" value="400" /></label>
+      <button type="button" id="zoom-out">Zoom out</button>
+      <button class="primary" type="button" id="reset">Reset</button>
+    </div>
+  </body>
+</html>
