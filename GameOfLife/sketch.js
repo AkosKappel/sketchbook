@@ -7,19 +7,19 @@ let playing = true;
 let lastStep = 0;
 let paintValue = null; // what a drag paints: 1 to draw, 0 to erase, null when not drawing
 
+const stage = document.querySelector('.stage');
 const playButton = document.getElementById('play');
 const speedInput = document.getElementById('speed');
 const generationOutput = document.getElementById('generation');
 const aliveOutput = document.getElementById('alive');
 
 function setup() {
-  const stage = document.querySelector('.stage');
-  cols = max(8, floor((stage.clientWidth - 32) / cellSize));
-  rows = max(8, floor((stage.clientHeight - 32) / cellSize));
+  [cols, rows] = gridSize();
   const canvas = createCanvas(cols * cellSize, rows * cellSize).parent(stage);
 
   randomize();
   setupDrawing(canvas.elt);
+  new ResizeObserver(regrid).observe(stage);
 
   playButton.addEventListener('click', togglePlay);
   document.getElementById('step').addEventListener('click', () => {
@@ -39,6 +39,30 @@ function setup() {
     event.preventDefault();
     togglePlay();
   });
+}
+
+function gridSize() {
+  return [max(8, floor((stage.clientWidth - 32) / cellSize)), max(8, floor((stage.clientHeight - 32) / cellSize))];
+}
+
+// After a resize or rotation the grid gets the new size and keeps the pattern centered on it.
+function regrid() {
+  const [newCols, newRows] = gridSize();
+  if (newCols === cols && newRows === rows) return;
+
+  const next = new Uint8Array(newCols * newRows);
+  const offsetX = floor((newCols - cols) / 2);
+  const offsetY = floor((newRows - rows) / 2);
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      const nx = x + offsetX;
+      const ny = y + offsetY;
+      if (nx >= 0 && nx < newCols && ny >= 0 && ny < newRows) next[ny * newCols + nx] = cells[y * cols + x];
+    }
+  }
+  [cols, rows, cells] = [newCols, newRows, next];
+  resizeCanvas(cols * cellSize, rows * cellSize);
+  updateStats();
 }
 
 function draw() {

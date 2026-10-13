@@ -4,6 +4,7 @@ let apple;
 let state = 'ready'; // ready | running | paused | over
 let best = loadBest();
 
+const stage = document.querySelector('.stage');
 const overlay = document.getElementById('overlay');
 const overlayTitle = document.getElementById('overlay-title');
 const overlayText = document.getElementById('overlay-text');
@@ -14,25 +15,50 @@ const cols = () => floor(width / cellSize);
 const rows = () => floor(height / cellSize);
 
 function setup() {
-  const stage = document.querySelector('.stage');
-  const available = min(stage.clientWidth, stage.clientHeight) - 32;
-  cellSize = available < 500 ? 22 : 30;
-
-  // the board is a whole number of cells, at most 30 x 26
-  const boardCols = min(30, floor((stage.clientWidth - 32) / cellSize));
-  const boardRows = min(26, floor((stage.clientHeight - 32) / cellSize));
-  createCanvas(boardCols * cellSize, boardRows * cellSize).parent(stage);
+  createCanvas(1, 1).parent(stage);
   frameRate(10);
 
   newGame();
   bestOutput.value = best;
   setupSwipe(stage);
+  new ResizeObserver(fitBoard).observe(stage);
   document.addEventListener('visibilitychange', () => {
     if (document.hidden && state === 'running') setState('paused');
   });
 }
 
+// The board is a whole number of cells, at most 30 x 26, with bigger cells on bigger screens.
+function boardSize() {
+  const availableWidth = stage.clientWidth - 32;
+  const availableHeight = stage.clientHeight - 32;
+  const cell = min(availableWidth, availableHeight) < 500 ? 22 : 30;
+  return {
+    cell,
+    cols: max(8, min(30, floor(availableWidth / cell))),
+    rows: max(8, min(26, floor(availableHeight / cell))),
+  };
+}
+
+function fitBoard() {
+  const size = boardSize();
+  if (size.cell === cellSize && size.cols === cols() && size.rows === rows()) return;
+
+  if (state === 'running' || state === 'paused') {
+    // A game in progress keeps its grid, scaled down to fit; the new grid starts with the next game.
+    setState('paused');
+    const scale = min(1, (stage.clientWidth - 32) / width, (stage.clientHeight - 32) / height);
+    const canvas = document.querySelector('canvas');
+    canvas.style.width = `${width * scale}px`;
+    canvas.style.height = `${height * scale}px`;
+  } else {
+    newGame();
+  }
+}
+
 function newGame() {
+  const size = boardSize();
+  cellSize = size.cell;
+  resizeCanvas(size.cols * cellSize, size.rows * cellSize);
   snake = new Snake();
   apple = new Apple();
   scoreOutput.value = 0;
