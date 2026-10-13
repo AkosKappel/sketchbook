@@ -228,6 +228,10 @@ input[type='checkbox'] {
 }
 
 @media (max-width: 640px) {
+  input[type='range'] {
+    width: 110px;
+  }
+
   .hint {
     flex-basis: 100%;
     margin: 0;
