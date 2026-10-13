@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chaos game</title>
+    <link href="style.css" , rel="stylesheet" , type="text/css" />
+    <script src="../p5.js"></script>
+    <!-- <script src="../addons/p5.sound.js"></script> -->
+    <script src="sketch.js"></script>
+  </head>
+  <body>
+    <main></main>
+    <div class="card">
+      <div class="card-body">
+        <label
+          >Number of points:
+          <select id="vertexCountField">
+            <option value="3" selected>3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+          </select>
+        </label>
+        <label>Movement range: <input type="text" size="1" value="0.5" id="percentField" /></label>
+        <label>Repeat previous point: <input type="checkbox" id="canRepeat" checked /></label>
+        <label>Use colors: <input type="checkbox" id="useColors" checked /></label>
+        <label>Speed: <input type="range" min="1" max="500" value="100" id="speedSlider" /></label>
+        <br />
+        <label>
+          <button type="button" id="pause-btn">Pause</button>
+          <button type="button" id="start-btn">Start</button>
+        </label>
+      </div>
+      <div id="canvas-holder">
+        <!-- canvas goes here -->
+      </div>
+    </div>
+  </body>
+</html>

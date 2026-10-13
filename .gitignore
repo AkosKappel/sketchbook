@@ -1,0 +1,17 @@
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# Local tooling
+node_modules/
+.worktrees/
+.playwright-mcp/
+*.log
+.env
+.env.*
+
+# Agent planning files
+BACKLOG.md
