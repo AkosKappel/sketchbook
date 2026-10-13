@@ -31,7 +31,7 @@ function draw() {
   rectMode(CENTER);
   let range = new Rectangle(mouseX, mouseY, 25, 25);
 
-  if (mouseX < width && mouseY < height) {
+  if (mouseX >= 0 && mouseX < width && mouseY >= 0 && mouseY < height) {
     rect(range.x, range.y, range.w * 2, range.h * 2);
     let points = qtree.query(range);
     for (let p of points) {
