@@ -1,125 +1,104 @@
-const canvas = document.getElementById('canvas1');
+const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-let particleArray = [];
+const stage = canvas.parentElement;
 
-// mouse
-const mouse = {
-  x: null,
-  y: null,
-  radius: (canvas.height / 100) * (canvas.width / 100),
-};
+const connectDistance = 120;
+const maxParticles = 160;
+const repelStep = 5;
+const speed = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0.3 : 1;
 
-window.addEventListener('mousemove', function (event) {
-  mouse.x = event.x;
-  mouse.y = event.y;
-});
+const pointer = { x: 0, y: 0, active: false, radius: 0 };
+let width = 0;
+let height = 0;
+let particles = [];
 
 class Particle {
-  constructor(x, y, directionX, directionY, size, color) {
-    this.x = x;
-    this.y = y;
-    this.directionX = directionX;
-    this.directionY = directionY;
-    this.size = size;
-    this.color = color;
+  constructor() {
+    this.size = Math.random() * 3 + 1;
+    this.x = Math.random() * width;
+    this.y = Math.random() * height;
+    this.directionX = (Math.random() * 3 - 1.5) * speed;
+    this.directionY = (Math.random() * 3 - 1.5) * speed;
+  }
+
+  update() {
+    if (this.x < 0 || this.x > width) this.directionX = -this.directionX;
+    if (this.y < 0 || this.y > height) this.directionY = -this.directionY;
+
+    if (pointer.active) {
+      const dx = this.x - pointer.x;
+      const dy = this.y - pointer.y;
+      const distance = Math.hypot(dx, dy);
+      if (distance > 0 && distance < pointer.radius + this.size) {
+        this.x = Math.min(Math.max(this.x + (dx / distance) * repelStep, 0), width);
+        this.y = Math.min(Math.max(this.y + (dy / distance) * repelStep, 0), height);
+      }
+    }
+
+    this.x += this.directionX;
+    this.y += this.directionY;
   }
 
   draw() {
     ctx.beginPath();
-    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
-    ctx.fillStyle = '#8C5523';
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
     ctx.fill();
   }
-
-  update() {
-    // check if particle is still within canvas
-    if (this.x > canvas.width || this.x < 0) this.directionX = -this.directionX;
-    if (this.y > canvas.height || this.y < 0) this.directionY = -this.directionY;
-
-    // collision detection for mouse and particle
-    let dx = mouse.x - this.x;
-    let dy = mouse.y - this.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    const repulsiveForce = 5;
-
-    if (distance < mouse.radius + this.size) {
-      if (mouse.x < this.x && this.x < canvas.width - this.size * 10) this.x += repulsiveForce;
-      if (mouse.x > this.x && this.x > this.size * 10) this.x -= repulsiveForce;
-      if (mouse.y < this.y && this.y < canvas.height - this.size * 10) this.y += repulsiveForce;
-      if (mouse.y > this.y && this.y > this.size * 10) this.y -= repulsiveForce;
-    }
-
-    // move particle
-    this.x += this.directionX;
-    this.y += this.directionY;
-
-    this.draw();
-  }
 }
 
-// create particles
-function init() {
-  particleArray = [];
-  const numberOfParticles = (canvas.height * canvas.width) / 9000;
-
-  for (let i = 0; i < numberOfParticles; i++) {
-    let size = Math.random() * 5 + 1;
-    let x = Math.random() * (innerWidth - size * 4) + size * 2;
-    let y = Math.random() * (innerHeight - size * 4) + size * 2;
-    let directionX = Math.random() * 5 - 2.5;
-    let directionY = Math.random() * 5 - 2.5;
-    let color = '#8C5523';
-
-    particleArray.push(new Particle(x, y, directionX, directionY, size, color));
-  }
-}
-
-function animate() {
-  requestAnimationFrame(animate);
-  ctx.clearRect(0, 0, innerWidth, innerHeight);
-
-  for (const particle of particleArray) {
-    particle.update();
-  }
-  connect();
-}
-
-// check if particles are close enough to draw line between them
 function connect() {
-  let opacityValue = 1;
-
-  for (let i = 0; i < particleArray.length; i++) {
-    for (let j = i + 1; j < particleArray.length; j++) {
-      const distance = (particleArray[i].x - particleArray[j].x) ** 2 + (particleArray[i].y - particleArray[j].y) ** 2;
-
-      if (distance < (canvas.width / 7) * (canvas.height / 7)) {
-        opacityValue = 1 - distance / 20000;
-        ctx.strokeStyle = `rgba(140, 85, 31, ${opacityValue})`;
-        ctx.lineWidth = 1;
+  ctx.lineWidth = 1;
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const a = particles[i];
+      const b = particles[j];
+      const distance = Math.hypot(a.x - b.x, a.y - b.y);
+      if (distance < connectDistance) {
+        ctx.strokeStyle = `rgb(96 165 250 / ${1 - distance / connectDistance})`;
         ctx.beginPath();
-        ctx.moveTo(particleArray[i].x, particleArray[i].y);
-        ctx.lineTo(particleArray[j].x, particleArray[j].y);
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
         ctx.stroke();
       }
     }
   }
 }
 
-// resize event
-window.addEventListener('resize', function () {
-  canvas.width = innerWidth;
-  canvas.height = innerHeight;
-  mouse.radius = (canvas.height / 100) * (canvas.width / 100);
-  init();
+function resize() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  width = stage.clientWidth;
+  height = stage.clientHeight;
+  canvas.width = Math.round(width * dpr);
+  canvas.height = Math.round(height * dpr);
+  canvas.style.width = `${width}px`;
+  canvas.style.height = `${height}px`;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  pointer.radius = Math.max(80, Math.min(width, height) / 5);
+  const count = Math.min(Math.round((width * height) / 9000), maxParticles);
+  particles = Array.from({ length: count }, () => new Particle());
+}
+
+function animate() {
+  ctx.clearRect(0, 0, width, height);
+  for (const particle of particles) particle.update();
+  connect();
+  ctx.fillStyle = '#6ee7b7';
+  for (const particle of particles) particle.draw();
+  requestAnimationFrame(animate);
+}
+
+function trackPointer(event) {
+  pointer.x = event.offsetX;
+  pointer.y = event.offsetY;
+  pointer.active = true;
+}
+
+canvas.addEventListener('pointermove', trackPointer);
+canvas.addEventListener('pointerdown', trackPointer);
+canvas.addEventListener('pointerleave', () => {
+  pointer.active = false;
 });
 
-// mouse out event
-window.addEventListener('mouseout', function () {
-  mouse.x = undefined;
-  mouse.y = undefined;
-});
-
-init();
-animate();
+new ResizeObserver(resize).observe(stage);
+requestAnimationFrame(animate);
