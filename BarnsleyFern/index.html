@@ -1,23 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Barnsley Fern</title>
-  <style>
-    body {
-      padding: 0;
-      margin: 0;
-    }
-  </style>
-  <script src="../lib/p5.min.js"></script>
-  <script src="sketch.js"></script>
-</head>
-
-<body>
-  <main>
-  </main>
-</body>
-
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Barnsley Fern · Mini Projects</title>
+    <link rel="icon" href="../shared/favicon.svg" />
+    <link rel="stylesheet" href="../shared/base.css" />
+    <script defer src="../lib/p5.min.js"></script>
+    <script defer src="../shared/fit-canvas.js"></script>
+    <script defer src="sketch.js"></script>
+  </head>
+  <body class="project">
+    <header class="topbar">
+      <a class="back" href="../">← All projects</a>
+      <h1>Barnsley Fern</h1>
+      <span class="stat">Progress <output id="progress">0%</output></span>
+      <p class="hint">Four random affine maps, applied over and over, grow a fern.</p>
+    </header>
+    <main class="stage padded"></main>
+    <div class="controls">
+      <label>
+        Speed
+        <input id="speed" type="range" min="100" max="5000" step="100" value="1000" />
+      </label>
+      <button id="restart" class="primary" type="button">Restart</button>
+    </div>
+  </body>
 </html>
