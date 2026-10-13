@@ -1,113 +1,96 @@
-const canvas = document.getElementById('canvas1');
+const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+const stage = canvas.parentElement;
 
-let particleArray = [];
-const colors = ['white', 'rgba(255, 255, 255, 0.3)', 'rgba(173, 216, 230, 0.8)', 'rgba(211, 211, 211, 0.8)'];
+const colors = ['#ffffff', 'rgb(255 255 255 / 0.3)', 'rgb(173 216 230 / 0.8)', 'rgb(211 211 211 / 0.8)'];
 const maxSize = 40;
-const minSize = 0;
-const mouseRadius = 60;
+const growth = 3;
+const shrink = 0.3;
+const pointerRadius = 60;
+// Clouds only grow while the pointer moves; an idle pointer lets them fade away.
+const pointerIdleMs = 1000;
 
-// mouse position
-const mouse = {
-  x: null,
-  y: null,
-};
+const pointer = { x: 0, y: 0, active: false, lastMove: 0 };
+let width = 0;
+let height = 0;
+let sky;
+let particles = [];
 
-window.addEventListener('mousemove', function (event) {
-  mouse.x = event.x;
-  mouse.y = event.y;
-});
-
-function Particle(x, y, directionX, directionY, size, color) {
-  this.x = x;
-  this.y = y;
-  this.directionX = directionX;
-  this.directionY = directionY;
-  this.size = size;
-  this.color = color;
-}
-
-Particle.prototype.draw = function () {
-  ctx.beginPath();
-  ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
-  // ctx.fillRect(this.x, this.y, this.size, this.size);
-  ctx.fillStyle = this.color;
-  ctx.fill();
-  // ctx.strokeStyle = 'white';
-  // ctx.stroke();
-};
-
-Particle.prototype.update = function () {
-  if (this.x + this.size * 2 > canvas.width || this.x - this.size * 2 < 0) {
-    this.directionX = -this.directionX;
-  }
-  if (this.y + this.size * 2 > canvas.height || this.y - this.size * 2 < 0) {
-    this.directionY = -this.directionY;
-  }
-
-  this.x += this.directionX;
-  this.y += this.directionY;
-
-  // mouse interactivity
-  if (
-    mouse.x - this.x < mouseRadius &&
-    mouse.x - this.x > -mouseRadius &&
-    mouse.y - this.y < mouseRadius &&
-    mouse.y - this.y > -mouseRadius
-  ) {
-    if (this.size < maxSize) {
-      this.size += 3;
-    }
-  } else if (this.size > minSize) {
-    this.size -= 0.3;
-  }
-
-  if (this.size < 0) {
+class Particle {
+  constructor() {
+    this.x = Math.random() * width;
+    this.y = Math.random() * height;
+    this.directionX = Math.random() * 0.2 - 0.1;
+    this.directionY = Math.random() * 0.2 - 0.1;
     this.size = 0;
+    this.color = colors[Math.floor(Math.random() * colors.length)];
   }
-  this.draw();
-};
 
-// create particles
-function init() {
-  particleArray = [];
-  const numberOfParticles = 1000;
+  update(pointerActive) {
+    if (this.x < 0 || this.x > width) this.directionX = -this.directionX;
+    if (this.y < 0 || this.y > height) this.directionY = -this.directionY;
+    this.x += this.directionX;
+    this.y += this.directionY;
 
-  for (let i = 0; i < numberOfParticles; i++) {
-    let size = 0;
-    let x = Math.random() * (innerWidth - size * 4) + size * 2;
-    let y = Math.random() * (innerHeight - size * 4) + size * 2;
-    let directionX = Math.random() * 0.2 - 0.1;
-    let directionY = Math.random() * 0.2 - 0.1;
-    let color = colors[Math.floor(Math.random() * colors.length)];
+    const dx = pointer.x - this.x;
+    const dy = pointer.y - this.y;
+    if (pointerActive && dx * dx + dy * dy < pointerRadius * pointerRadius) {
+      this.size = Math.min(this.size + growth, maxSize);
+    } else {
+      this.size = Math.max(this.size - shrink, 0);
+    }
+  }
 
-    particleArray.push(new Particle(x, y, directionX, directionY, size, color));
+  draw() {
+    if (this.size === 0) return;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fillStyle = this.color;
+    ctx.fill();
   }
 }
 
-// animation loop
-function animate() {
+function resize() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  width = stage.clientWidth;
+  height = stage.clientHeight;
+  canvas.width = Math.round(width * dpr);
+  canvas.height = Math.round(height * dpr);
+  canvas.style.width = `${width}px`;
+  canvas.style.height = `${height}px`;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  sky = ctx.createLinearGradient(0, 0, 0, height);
+  sky.addColorStop(0, '#0b0d12');
+  sky.addColorStop(1, '#1f3354');
+
+  const count = Math.min(Math.round((width * height) / 1500), 1500);
+  particles = Array.from({ length: count }, () => new Particle());
+}
+
+function animate(time) {
+  const pointerActive = pointer.active && time - pointer.lastMove < pointerIdleMs;
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, width, height);
+  for (const particle of particles) {
+    particle.update(pointerActive);
+    particle.draw();
+  }
   requestAnimationFrame(animate);
-  ctx.clearRect(0, 0, innerWidth, innerHeight);
-
-  for (const particle of particleArray) {
-    particle.update();
-  }
 }
 
-window.addEventListener('resize', function () {
-  canvas.width = innerWidth;
-  canvas.height = innerHeight;
-  init();
+function trackPointer(event) {
+  pointer.x = event.offsetX;
+  pointer.y = event.offsetY;
+  pointer.active = true;
+  pointer.lastMove = event.timeStamp;
+}
+
+canvas.addEventListener('pointermove', trackPointer);
+canvas.addEventListener('pointerdown', trackPointer);
+canvas.addEventListener('pointerleave', () => {
+  pointer.active = false;
 });
 
-// remove mouse position periodically
-setInterval(function () {
-  mouse.x = undefined;
-  mouse.y = undefined;
-}, 1000);
-
-init();
-animate();
+new ResizeObserver(resize).observe(stage);
+requestAnimationFrame(animate);
