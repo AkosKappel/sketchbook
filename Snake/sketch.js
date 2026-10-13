@@ -30,21 +30,26 @@ function draw() {
 }
 
 function keyPressed() {
-  if (keyCode === UP_ARROW && snake.direction !== DIRECTION.down) {
-    snake.direction = DIRECTION.up;
+  const turns = {
+    [UP_ARROW]: [DIRECTION.up, DIRECTION.down],
+    [DOWN_ARROW]: [DIRECTION.down, DIRECTION.up],
+    [LEFT_ARROW]: [DIRECTION.left, DIRECTION.right],
+    [RIGHT_ARROW]: [DIRECTION.right, DIRECTION.left],
+  };
+
+  if (turns[keyCode]) {
+    const [direction, opposite] = turns[keyCode];
+    if (snake.direction !== opposite) {
+      snake.nextDirection = direction;
+    }
+    return false; // keep the arrow keys from scrolling the page
   }
-  if (keyCode === DOWN_ARROW && snake.direction !== DIRECTION.up) {
-    snake.direction = DIRECTION.down;
-  }
-  if (keyCode === LEFT_ARROW && snake.direction !== DIRECTION.right) {
-    snake.direction = DIRECTION.left;
-  }
-  if (keyCode === RIGHT_ARROW && snake.direction !== DIRECTION.left) {
-    snake.direction = DIRECTION.right;
-  }
+
   if (snake.dead && key === ' ') {
     snake = new Snake();
+    apple.setRandomPosition();
     loop();
+    return false;
   }
 }
 

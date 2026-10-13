@@ -6,6 +6,7 @@ class Snake {
     length = min(length, width / cellWidth / 2, height / cellHeight / 2);
     this.createTail(length);
     this.tail = this.body[length - 1];
+    this.nextDirection = this.direction;
     this.dead = false;
   }
 
@@ -34,7 +35,10 @@ class Snake {
   }
 
   move() {
-    // update tale position
+    // apply the queued turn only now, so two quick key presses can't reverse the snake into itself
+    this.direction = this.nextDirection;
+
+    // update tail position
     const last = this.body.length - 1;
     this.tail = createVector(this.body[last].x, this.body[last].y);
 
@@ -81,6 +85,7 @@ class Snake {
     for (let i = 1; i < this.body.length; i++) {
       if (this.body[0].x === this.body[i].x && this.body[0].y === this.body[i].y) {
         this.dead = true;
+        return;
       }
     }
   }
