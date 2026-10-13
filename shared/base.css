@@ -1,9 +1,9 @@
 :root {
   color-scheme: dark;
-  --bg: #0b0d12;
-  --surface: #141821;
-  --surface-2: #1c2130;
-  --border: #2a3142;
+  --bg: #0c111c;
+  --surface: #121927;
+  --surface-2: #1a2334;
+  --border: #263248;
   --text: #e8ebf2;
   --muted: #9aa3b5;
   --accent: #f5b942;
@@ -208,7 +208,7 @@ input[type='checkbox'] {
   display: grid;
   place-content: center;
   gap: 12px;
-  background: rgb(11 13 18 / 0.72);
+  background: rgb(12 17 28 / 0.72);
   text-align: center;
 }
 
