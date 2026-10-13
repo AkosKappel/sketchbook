@@ -1,67 +1,61 @@
-const canvas = document.getElementById('canvas1');
+const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
-const generateButton = document.querySelector('.generate-tree-button');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-let curve = 10;
+const stage = canvas.parentElement;
+let width = 0;
+let height = 0;
 
-function drawTree(startX, startY, len, angle, branchWidth, color1, color2) {
-  ctx.beginPath();
+function randomColor(lightness) {
+  return `hsl(${Math.random() * 360} 75% ${lightness}%)`;
+}
+
+function drawBranch(len, angle, branchWidth, branchColor, leafColor) {
   ctx.save();
-  ctx.strokeStyle = color1;
-  ctx.fillStyle = color2;
-  ctx.shadowBlur = 5;
-  ctx.shadowColor = 'rgba(255, 255, 255, 0.5)';
-  ctx.lineWidth = branchWidth;
-  ctx.translate(startX, startY);
   ctx.rotate((angle * Math.PI) / 180);
+  ctx.beginPath();
   ctx.moveTo(0, 0);
-  // ctx.lineTo(0, -len);
-  if (angle > 0) {
-    ctx.bezierCurveTo(20, -len / 2, 20, -len / 2, 0, -len);
-  } else {
-    ctx.bezierCurveTo(20, -len / 2, -20, -len / 2, 0, -len);
-  }
+  const bend = len / 6;
+  ctx.bezierCurveTo(bend, -len / 2, angle > 0 ? bend : -bend, -len / 2, 0, -len);
+  ctx.strokeStyle = branchColor;
+  ctx.lineWidth = branchWidth;
   ctx.stroke();
 
   if (len < 5) {
-    // leafs
     ctx.beginPath();
-    ctx.arc(0, -len, 10, 0, Math.PI / 2);
+    ctx.arc(0, -len, 8, 0, Math.PI / 2);
+    ctx.fillStyle = leafColor;
     ctx.fill();
-    ctx.restore();
-    return;
+  } else {
+    // Branch angles are relative to the parent, so draw children from the branch tip.
+    ctx.translate(0, -len);
+    const curve = Math.random() * 10 + 10;
+    drawBranch(len * 0.75, angle + curve, branchWidth * 0.6, branchColor, leafColor);
+    drawBranch(len * 0.75, angle - curve, branchWidth * 0.6, branchColor, leafColor);
   }
-  curve = Math.random() * 10 + 10;
-
-  drawTree(0, -len, len * 0.75, angle + curve, branchWidth * 0.6, color1, color2);
-  drawTree(0, -len, len * 0.75, angle - curve, branchWidth * 0.6, color1, color2);
-
   ctx.restore();
 }
 
-drawTree(canvas.width / 2, canvas.height - 80, 120, 0, 15, 'brown', 'pink');
-
-function generateRandomTree() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  let centerPointX = canvas.width / 2;
-  let centerPointY = canvas.height - 80;
-  let len = Math.floor(Math.random() * 20) + 100;
-  let angle = 0;
-  let branchWidth = Math.random() * 70 + 1;
-  let color1 = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`;
-  let color2 = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`;
-
-  generateButton.style.background = color1;
-
-  drawTree(centerPointX, centerPointY, len, angle, branchWidth, color1, color2);
+function generateTree() {
+  ctx.clearRect(0, 0, width, height);
+  // The crown reaches about four trunk lengths up and two to each side, so this keeps it on screen.
+  const trunk = Math.min(height * 0.21, width * 0.2) * (0.9 + Math.random() * 0.15);
+  const branchWidth = trunk * (0.06 + Math.random() * 0.12);
+  ctx.save();
+  ctx.translate(width / 2, height - 8);
+  drawBranch(trunk, 0, branchWidth, randomColor(55), randomColor(70));
+  ctx.restore();
 }
 
-generateButton.addEventListener('click', generateRandomTree);
+function resize() {
+  const dpr = window.devicePixelRatio || 1;
+  width = stage.clientWidth;
+  height = stage.clientHeight;
+  canvas.width = Math.round(width * dpr);
+  canvas.height = Math.round(height * dpr);
+  canvas.style.width = `${width}px`;
+  canvas.style.height = `${height}px`;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  generateTree();
+}
 
-window.addEventListener('resize', () => {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  generateRandomTree();
-});
+document.getElementById('generate').addEventListener('click', generateTree);
+new ResizeObserver(resize).observe(stage);
