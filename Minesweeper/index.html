@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Minesweeper · SketchBook</title>
+    <link rel="icon" href="../shared/favicon.svg" />
+    <link rel="stylesheet" href="../shared/base.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script defer src="app.js"></script>
+  </head>
+  <body class="project">
+    <header class="topbar">
+      <a class="back" href="../">← All projects</a>
+      <h1>Minesweeper</h1>
+      <span class="stat">Mines <output id="mines-left">10</output></span>
+      <span class="stat">Time <output id="time">0</output></span>
+      <span class="stat">Best <output id="best">–</output></span>
+      <p class="hint">Click to reveal, right-click or long-press to flag</p>
+    </header>
+    <main class="stage padded">
+      <div class="board" id="board"></div>
+    </main>
+    <footer class="controls">
+      <span class="stat"><strong id="status" aria-live="polite">Click any cell to start</strong></span>
+      <label>
+        Difficulty
+        <select id="difficulty">
+          <option value="easy">Easy</option>
+          <option value="medium">Medium</option>
+          <option value="hard">Hard</option>
+        </select>
+      </label>
+      <button type="button" id="flag-mode" aria-pressed="false">Flag mode</button>
+      <button class="primary" type="button" id="new-game">New game</button>
+    </footer>
+  </body>
+</html>

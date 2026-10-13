@@ -1,0 +1,65 @@
+.board {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), var(--cell));
+  gap: 2px;
+  padding: 2px;
+  border-radius: 6px;
+  background: var(--border);
+  box-shadow: 0 10px 40px rgb(0 0 0 / 0.5);
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.cell {
+  display: grid;
+  place-items: center;
+  width: var(--cell);
+  height: var(--cell);
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: #2b3850;
+  font: 700 calc(var(--cell) * 0.55) / 1 var(--mono);
+  touch-action: manipulation;
+}
+
+.cell:hover {
+  background: #34445f;
+}
+
+.cell.open {
+  background: #161b26;
+  cursor: default;
+}
+
+.cell.mine {
+  background: #5c2230;
+}
+
+.cell.mine.hit {
+  background: #ff5c6c;
+}
+
+.cell.flag {
+  color: var(--accent);
+}
+
+.cell.wrong {
+  background: #3d2a1a;
+  color: var(--accent);
+}
+
+.n1 { color: #7aa7ff; }
+.n2 { color: #5ee6a0; }
+.n3 { color: #ff7a90; }
+.n4 { color: #c39bff; }
+.n5 { color: #f5b942; }
+.n6 { color: #5ed8e6; }
+.n7 { color: #e8ebf2; }
+.n8 { color: #9aa3b5; }
+
+#flag-mode[aria-pressed='true'] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
