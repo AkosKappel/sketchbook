@@ -1,139 +1,90 @@
+// Rules after Craig Reynolds' boids: http://www.red3d.com/cwr/boids/
 class Boid {
   constructor() {
-    this.pos = createVector(random(1) * width, random(1) * height);
-    this.vel = p5.Vector.fromAngle(random(TWO_PI));
-    this.vel.mult(random(5));
+    this.pos = createVector(random(width), random(height));
+    this.vel = p5.Vector.random2D().mult(random(2, 5));
     this.history = [];
   }
 
-  show() {
-    this.drawBoid();
-  }
-
-  move() {
-    this.pos.add(this.vel);
-    this.history.push([this.pos.x, this.pos.y]);
-    this.history = this.history.slice(-50);
-  }
-
-  update() {
-    this.flyTowardsCenter();
-    this.avoidOthers();
-    this.matchVelocity();
-    this.limitSpeed();
+  update(flock) {
+    this.flock(flock);
+    this.avoidPointer();
+    this.vel.limit(maxSpeed);
     this.keepWithinBounds();
-    this.move();
+    this.pos.add(this.vel);
+
+    this.history.push([this.pos.x, this.pos.y]);
+    if (this.history.length > trailLength) this.history.shift();
+  }
+
+  // cohesion, separation and alignment share one pass over the flock;
+  // plain numbers instead of p5.Vector keep this O(n²) loop cheap
+  flock(flock) {
+    const visionSq = settings.vision ** 2;
+    const minDistanceSq = minDistance ** 2;
+    let centerX = 0;
+    let centerY = 0;
+    let velX = 0;
+    let velY = 0;
+    let awayX = 0;
+    let awayY = 0;
+    let neighbours = 0;
+
+    for (const other of flock) {
+      if (other === this) continue;
+      const dx = this.pos.x - other.pos.x;
+      const dy = this.pos.y - other.pos.y;
+      const distSq = dx * dx + dy * dy;
+      if (distSq < visionSq) {
+        centerX += other.pos.x;
+        centerY += other.pos.y;
+        velX += other.vel.x;
+        velY += other.vel.y;
+        neighbours++;
+      }
+      if (distSq < minDistanceSq) {
+        awayX += dx;
+        awayY += dy;
+      }
+    }
+
+    if (neighbours > 0) {
+      this.vel.x += (centerX / neighbours - this.pos.x) * settings.cohesion;
+      this.vel.y += (centerY / neighbours - this.pos.y) * settings.cohesion;
+      this.vel.x += (velX / neighbours - this.vel.x) * settings.alignment;
+      this.vel.y += (velY / neighbours - this.vel.y) * settings.alignment;
+    }
+    this.vel.x += awayX * settings.separation;
+    this.vel.y += awayY * settings.separation;
+  }
+
+  avoidPointer() {
+    if (!pointer) return;
+    const away = p5.Vector.sub(this.pos, pointer);
+    const d = away.mag();
+    if (d > 0 && d < pointerRange) {
+      // the closer to the pointer, the harder the push
+      this.vel.add(away.setMag((1 - d / pointerRange) * 2));
+    }
   }
 
   keepWithinBounds() {
     const padding = min(200, width * 0.15, height * 0.15);
-    const turnFactor = 1;
-
-    if (this.pos.x < padding) {
-      this.vel.x += turnFactor;
-    }
-    if (this.pos.y < padding) {
-      this.vel.y += turnFactor;
-    }
-    if (this.pos.x > width - padding) {
-      this.vel.x -= turnFactor;
-    }
-    if (this.pos.y > height - padding) {
-      this.vel.y -= turnFactor;
-    }
+    const turn = 1;
+    if (this.pos.x < padding) this.vel.x += turn;
+    if (this.pos.y < padding) this.vel.y += turn;
+    if (this.pos.x > width - padding) this.vel.x -= turn;
+    if (this.pos.y > height - padding) this.vel.y -= turn;
   }
 
-  flyTowardsCenter() {
-    const centeringFactor = 0.005; // adjust velocity by this %
-
-    let center = createVector(0, 0);
-    let numNeighbors = 0;
-
-    for (const otherBoid of boids) {
-      if (this.distance(otherBoid) < visualRange) {
-        center.add(otherBoid.pos);
-        numNeighbors++;
-      }
-    }
-
-    if (numNeighbors > 1) {
-      center.div(numNeighbors);
-      center.sub(this.pos);
-      center.mult(centeringFactor);
-      this.vel.add(center);
-    }
+  traceTrail(ctx) {
+    this.history.forEach(([x, y], i) => (i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)));
   }
 
-  distance(boid) {
-    return sqrt((this.pos.x - boid.pos.x) ** 2 + (this.pos.y - boid.pos.y) ** 2);
-  }
-
-  avoidOthers() {
-    const minDistance = 20; // the distance to stay away from other boids
-    const avoidFactor = 0.05; // adjust velocity by this %
-
-    let move = createVector(0, 0);
-
-    for (const otherBoid of boids) {
-      if (this !== otherBoid) {
-        if (this.distance(otherBoid) < minDistance) {
-          let d = p5.Vector.sub(this.pos, otherBoid.pos);
-          move.add(d);
-        }
-      }
-    }
-
-    move.mult(avoidFactor);
-    this.vel.add(move);
-  }
-
-  matchVelocity() {
-    const matchingFactor = 0.05; // adjust by this % of average velocity
-
-    let avgVel = createVector(0, 0);
-    let numNeighbors = 0;
-
-    for (const otherBoid of boids) {
-      if (this.distance(otherBoid) < visualRange) {
-        avgVel.add(otherBoid.vel);
-        numNeighbors++;
-      }
-    }
-
-    if (numNeighbors > 1) {
-      avgVel.div(numNeighbors);
-      avgVel.sub(this.vel);
-      avgVel.mult(matchingFactor);
-      this.vel.add(avgVel);
-    }
-  }
-
-  limitSpeed() {
-    const speedLimit = 15;
-
-    const speed = this.vel.mag();
-    if (speed > speedLimit) {
-      this.vel.div(speed);
-      this.vel.mult(speedLimit);
-    }
-  }
-
-  drawBoid() {
-    if (drawTail) {
-      stroke(85, 140, 244, 102);
-      noFill();
-      beginShape();
-      for (const [x, y] of this.history) {
-        vertex(x, y);
-      }
-      endShape();
-    }
-
+  show() {
     push();
     translate(this.pos.x, this.pos.y);
     rotate(this.vel.heading());
-    noStroke();
-    fill(85, 140, 244);
     triangle(0, 0, -15, 5, -15, -5);
     pop();
   }
