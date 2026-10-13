@@ -56,7 +56,8 @@ myImage.addEventListener('load', function() {
             this.positionY = Math.floor(this.y / detail);
             this.positionX = Math.floor(this.x / detail);
             this.speed = mappedImage[this.positionY][this.positionX].cellBrightness;
-            let movement = (2.5 - this.speed) + this.velocity;
+            // bright pixels slow particles down; never let them stop or move up (out of the image)
+            let movement = Math.max((2.5 - this.speed) + this.velocity, 0.1);
 
             this.y += movement;
             if (this.y >= canvas.height) {
