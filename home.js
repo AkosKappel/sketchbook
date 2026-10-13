@@ -5,8 +5,8 @@ const canvas = hero.querySelector('.hero-canvas');
 const ctx = canvas.getContext('2d');
 
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-// mostly the text color, with a sprinkle of the four category colors
-const palette = [...Array(24).fill('#e8ebf2'), '#f5b942', '#5ee6a0', '#7aa7ff', '#ff7a90'];
+// mostly the text color, with a sprinkle of the category colors
+const palette = [...Array(24).fill('#e8ebf2'), ...CATEGORIES.map((category) => category.color)];
 const pointer = { x: -9999, y: -9999, radius: 90 };
 
 let particles = [];

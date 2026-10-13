@@ -1,10 +1,6 @@
 :root {
   --display: 'Bricolage Grotesque', var(--font);
   --body: 'IBM Plex Sans', var(--font);
-  --cat-game: #f5b942;
-  --cat-simulation: #5ee6a0;
-  --cat-math: #7aa7ff;
-  --cat-effect: #ff7a90;
 }
 
 body {
@@ -164,33 +160,6 @@ body {
   outline-offset: 2px;
 }
 
-.filters label[for='filter-all'] {
-  --dot: var(--text);
-}
-
-.cat-game {
-  --dot: var(--cat-game);
-}
-
-.cat-simulation {
-  --dot: var(--cat-simulation);
-}
-
-.cat-math {
-  --dot: var(--cat-math);
-}
-
-.cat-effect {
-  --dot: var(--cat-effect);
-}
-
-body:has(#filter-game:checked) .project-card:not([data-category='game']),
-body:has(#filter-simulation:checked) .project-card:not([data-category='simulation']),
-body:has(#filter-math:checked) .project-card:not([data-category='math']),
-body:has(#filter-effect:checked) .project-card:not([data-category='effect']) {
-  display: none;
-}
-
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -203,6 +172,10 @@ body:has(#filter-effect:checked) .project-card:not([data-category='effect']) {
 .project-card {
   display: flex;
   flex-direction: column;
+}
+
+.project-card[hidden] {
+  display: none;
 }
 
 .thumb {

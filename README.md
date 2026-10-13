@@ -19,6 +19,8 @@ Plain HTML, CSS and JavaScript with no build step. The p5.js projects use a vend
 
 ```
 index.html          landing page
+projects.js         project and category list the landing page is rendered from
+collection.js       renders the filters and project cards
 shared/             base stylesheet, canvas sizing and image input helpers, favicon
 lib/p5.min.js       p5.js 1.11.13
 thumbs/             landing page previews
