@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sorting · SketchBook</title>
+    <meta name="description" content="Six sorting algorithms step by step, with live counts of comparisons and writes." />
+    <link rel="icon" href="../shared/favicon.svg" />
+    <link rel="stylesheet" href="../shared/base.css" />
+    <script defer src="../shared/fit-canvas.js"></script>
+    <script defer src="app.js"></script>
+  </head>
+  <body class="project">
+    <header class="topbar">
+      <a class="back" href="../">← All projects</a>
+      <h1>Sorting</h1>
+      <span class="stat">Comparisons <output id="comparisons">0</output></span>
+      <span class="stat">Writes <output id="writes">0</output></span>
+      <p class="hint" id="hint"></p>
+    </header>
+    <main class="stage">
+      <canvas id="canvas"></canvas>
+    </main>
+    <div class="controls">
+      <label>
+        Algorithm
+        <select id="algorithm">
+          <option value="bubble">Bubble sort</option>
+          <option value="insertion">Insertion sort</option>
+          <option value="selection">Selection sort</option>
+          <option value="merge">Merge sort</option>
+          <option value="quick" selected>Quicksort</option>
+          <option value="heap">Heapsort</option>
+        </select>
+      </label>
+      <label>Items <input type="range" id="size" min="10" max="200" step="10" value="80" /></label>
+      <label>Speed <input type="range" id="speed" min="0" max="8" value="3" /></label>
+      <button type="button" id="shuffle">Shuffle</button>
+      <button class="primary" type="button" id="sort">Sort</button>
+    </div>
+  </body>
+</html>
