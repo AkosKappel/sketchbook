@@ -59,7 +59,7 @@ body {
 /* The heading stays real text for accessibility; once the sketch has drawn it, it becomes invisible */
 .hero-title {
   margin: 0;
-  font: 800 clamp(64px, 18vw, 168px) / 0.88 var(--display);
+  font: 800 clamp(48px, 16.5vw, 168px) / 0.88 var(--display);
   font-variation-settings: 'opsz' 96;
   letter-spacing: -0.045em;
 }

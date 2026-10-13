@@ -1,8 +1,8 @@
-# Mini Projects
+# SketchBook
 
 A collection of small browser experiments: classic games, simulations, fractals and canvas effects. Written while learning web development by following tutorials, then cleaned up, fixed and redesigned in 2026.
 
-Live: https://akoskappel.github.io/MiniProjects/
+Live: https://akoskappel.github.io/sketchbook/
 
 | Category | Projects |
 | --- | --- |
