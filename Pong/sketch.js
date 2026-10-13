@@ -145,18 +145,20 @@ function keyPressed() {
 }
 
 function setupTouch(canvasElement) {
-  // each finger keeps the paddle it started on, so two players can share one screen
+  // each finger keeps the side it started on, so two players can share one screen; storing the side
+  // instead of the paddle lets a finger held down across a new match steer the new match's paddle
   const dragging = new Map();
+  const paddleOn = (side) => (side === SIDE.left ? leftPaddle : rightPaddle);
   canvasElement.addEventListener('pointerdown', (event) => {
     // in 1 player mode the whole court moves your paddle
-    const paddle = players === 2 && event.offsetX > width / 2 ? rightPaddle : leftPaddle;
-    dragging.set(event.pointerId, paddle);
+    const side = players === 2 && event.offsetX > width / 2 ? SIDE.right : SIDE.left;
+    dragging.set(event.pointerId, side);
     canvasElement.setPointerCapture(event.pointerId);
-    paddle.target = event.offsetY;
+    paddleOn(side).target = event.offsetY;
   });
   canvasElement.addEventListener('pointermove', (event) => {
-    const paddle = dragging.get(event.pointerId);
-    if (paddle) paddle.target = event.offsetY;
+    const side = dragging.get(event.pointerId);
+    if (side) paddleOn(side).target = event.offsetY;
   });
   const release = (event) => dragging.delete(event.pointerId);
   canvasElement.addEventListener('pointerup', release);
