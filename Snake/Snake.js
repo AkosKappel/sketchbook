@@ -1,93 +1,83 @@
+const DIRECTION = {
+  up: 'up',
+  down: 'down',
+  left: 'left',
+  right: 'right',
+};
+
+const STEP = {
+  [DIRECTION.up]: [0, -1],
+  [DIRECTION.down]: [0, 1],
+  [DIRECTION.left]: [-1, 0],
+  [DIRECTION.right]: [1, 0],
+};
+
 class Snake {
   constructor(length = 4) {
-    this.direction = DIRECTION[Object.keys(DIRECTION)[floor(random() * Object.keys(DIRECTION).length)]];
-    this.color = color(82, 217, 69);
-    this.body = [createVector(width / 2, height / 2)];
-    length = min(length, width / cellWidth / 2, height / cellHeight / 2);
-    this.createTail(length);
-    this.tail = this.body[length - 1];
+    this.direction = random(Object.values(DIRECTION));
     this.nextDirection = this.direction;
+    this.color = color(94, 230, 160);
+    this.headColor = color(150, 245, 195);
     this.dead = false;
+
+    // start in the middle cell, with the tail trailing behind the head
+    const startX = floor(cols() / 2) * cellSize;
+    const startY = floor(rows() / 2) * cellSize;
+    const [dx, dy] = STEP[this.direction];
+    this.body = [];
+    for (let i = 0; i < length; i++) {
+      this.body.push(createVector(startX - dx * i * cellSize, startY - dy * i * cellSize));
+    }
+    this.tail = this.body[this.body.length - 1].copy();
   }
 
-  createTail(length) {
-    for (let i = 1; i < length; i++) {
-      let tail = null;
-
-      if (this.direction === DIRECTION.up) {
-        tail = createVector(width / 2, height / 2 + i * cellHeight);
-      } else if (this.direction === DIRECTION.down) {
-        tail = createVector(width / 2, height / 2 - i * cellHeight);
-      } else if (this.direction === DIRECTION.left) {
-        tail = createVector(width / 2 + i * cellWidth, height / 2);
-      } else if (this.direction === DIRECTION.right) {
-        tail = createVector(width / 2 - i * cellWidth, height / 2);
-      }
-      this.body.push(tail);
-    }
+  get score() {
+    return this.body.length - 4;
   }
 
   show() {
-    fill(this.color);
-    for (let i = 0; i < this.body.length; i++) {
-      rect(this.body[i].x, this.body[i].y, cellWidth, cellHeight);
+    noStroke();
+    for (let i = this.body.length - 1; i >= 0; i--) {
+      fill(i === 0 ? this.headColor : this.color);
+      rect(this.body[i].x + 1, this.body[i].y + 1, cellSize - 2, cellSize - 2, 6);
     }
   }
 
   move() {
     // apply the queued turn only now, so two quick key presses can't reverse the snake into itself
     this.direction = this.nextDirection;
+    this.tail = this.body[this.body.length - 1].copy();
 
-    // update tail position
-    const last = this.body.length - 1;
-    this.tail = createVector(this.body[last].x, this.body[last].y);
-
-    // move the tail
     for (let i = this.body.length - 1; i > 0; i--) {
-      this.body[i].x = this.body[i - 1].x;
-      this.body[i].y = this.body[i - 1].y;
+      this.body[i].set(this.body[i - 1]);
     }
 
-    // move the head
-    if (this.direction === DIRECTION.up) {
-      this.body[0].y -= cellHeight;
-    } else if (this.direction === DIRECTION.down) {
-      this.body[0].y += cellHeight;
-    } else if (this.direction === DIRECTION.left) {
-      this.body[0].x -= cellWidth;
-    } else if (this.direction === DIRECTION.right) {
-      this.body[0].x += cellWidth;
-    }
+    const [dx, dy] = STEP[this.direction];
+    this.body[0].add(dx * cellSize, dy * cellSize);
   }
 
   update() {
+    if (this.dead) {
+      return;
+    }
+    this.move();
+    this.checkWalls();
+    this.checkSelfCollision();
     if (!this.dead) {
-      this.move();
-      this.keepWithinBounds();
-      this.checkSelfCollision();
       this.checkEatenApple();
     }
   }
 
-  // kills the snake if it leaves the board
-  keepWithinBounds() {
-    if (
-      (this.body[0].x < 0 && this.direction === DIRECTION.left) ||
-      (this.body[0].y < 0 && this.direction === DIRECTION.up) ||
-      (this.body[0].x + cellWidth > width && this.direction === DIRECTION.right) ||
-      (this.body[0].y + cellHeight > height && this.direction === DIRECTION.down)
-    ) {
+  checkWalls() {
+    const head = this.body[0];
+    if (head.x < 0 || head.y < 0 || head.x >= cols() * cellSize || head.y >= rows() * cellSize) {
       this.dead = true;
     }
   }
 
   checkSelfCollision() {
-    for (let i = 1; i < this.body.length; i++) {
-      if (this.body[0].x === this.body[i].x && this.body[0].y === this.body[i].y) {
-        this.dead = true;
-        return;
-      }
-    }
+    const head = this.body[0];
+    this.dead ||= this.body.slice(1).some((part) => part.x === head.x && part.y === head.y);
   }
 
   checkEatenApple() {
@@ -96,12 +86,16 @@ class Snake {
       apple.setRandomPosition();
     }
   }
+
+  occupies(x, y) {
+    return this.body.some((part) => part.x === x && part.y === y);
+  }
+
+  turn(direction) {
+    const [dx, dy] = STEP[direction];
+    const [cx, cy] = STEP[this.direction];
+    if (dx !== -cx || dy !== -cy) {
+      this.nextDirection = direction;
+    }
+  }
 }
-
-const DIRECTION = {
-  up: 'up',
-  down: 'down',
-  left: 'left',
-  right: 'right',
-};
-

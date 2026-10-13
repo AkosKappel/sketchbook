@@ -3,16 +3,27 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Snake</title>
-    <link href="style.css" rel="stylesheet" />
-    <script src="../lib/p5.min.js"></script>
-    <script src="Apple.js"></script>
-    <script src="Snake.js"></script>
-    <script src="sketch.js"></script>
+    <title>Snake · Mini Projects</title>
+    <link rel="icon" href="../shared/favicon.svg" />
+    <link rel="stylesheet" href="../shared/base.css" />
+    <script defer src="../lib/p5.min.js"></script>
+    <script defer src="Snake.js"></script>
+    <script defer src="Apple.js"></script>
+    <script defer src="sketch.js"></script>
   </head>
-  <body>
-    <div id="canvas-container">
-      <!-- canvas goes here -->
-    </div>
+  <body class="project">
+    <header class="topbar">
+      <a class="back" href="../">← All projects</a>
+      <h1>Snake</h1>
+      <span class="stat">Score <output id="score">0</output></span>
+      <span class="stat">Best <output id="best">0</output></span>
+      <p class="hint"><kbd>←</kbd><kbd>↑</kbd><kbd>↓</kbd><kbd>→</kbd> or swipe to steer, <kbd>Space</kbd> to pause</p>
+    </header>
+    <main class="stage padded">
+      <div class="overlay" id="overlay">
+        <h2 id="overlay-title">Snake</h2>
+        <p id="overlay-text">Press an arrow key or swipe to start</p>
+      </div>
+    </main>
   </body>
 </html>

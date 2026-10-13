@@ -1,40 +1,27 @@
 class Apple {
   constructor() {
-    this.color = color(255, 79, 79);
+    this.color = color(255, 92, 108);
     this.pos = createVector(0, 0);
     this.setRandomPosition();
   }
 
   show() {
+    noStroke();
     fill(this.color);
-    rect(this.pos.x, this.pos.y, cellWidth, cellHeight);
+    circle(this.pos.x + cellSize / 2, this.pos.y + cellSize / 2, cellSize * 0.7);
   }
 
   setRandomPosition() {
-    const w = width / cellWidth;
-    const h = height / cellHeight;
-
-    let isEmptyCell = false;
-    while (!isEmptyCell) {
-      let x = floor(random() * w); // integer in range <0; w)
-      let y = floor(random() * h); // integer in range <0; h)
-
-      x *= cellWidth;
-      y *= cellHeight;
-
-      isEmptyCell = true;
-
-      for (let i = 0; i < snake.body.length; i++) {
-        if (snake.body[i].x === x && snake.body[i].y === y) {
-          isEmptyCell = false;
-          break;
+    const free = [];
+    for (let x = 0; x < cols(); x++) {
+      for (let y = 0; y < rows(); y++) {
+        if (!snake.occupies(x * cellSize, y * cellSize)) {
+          free.push([x * cellSize, y * cellSize]);
         }
       }
-
-      if (isEmptyCell) {
-        this.pos.x = x;
-        this.pos.y = y;
-      }
+    }
+    if (free.length > 0) {
+      this.pos.set(...random(free));
     }
   }
 }
