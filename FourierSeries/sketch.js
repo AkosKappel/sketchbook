@@ -39,21 +39,30 @@ function setup() {
   }
 }
 
+// The drawing is laid out for a landscape frame. On portrait screens that frame is turned a quarter
+// turn, so the circles sit at the top and the wave runs down the screen.
 function updateLayout() {
+  const portrait = height > width;
+  const [frameWidth, frameHeight] = portrait ? [height, width] : [width, height];
   const pad = 16;
-  const radius = min(height * 0.3, width * 0.16);
+  const radius = min(frameHeight * 0.3, frameWidth * 0.16);
   const centerX = pad + radius * 1.5;
   const waveOffset = radius * 1.9; // from the circles' center to the start of the wave
-  layout = { radius, centerX, centerY: height / 2, waveOffset, waveWidth: width - pad - centerX - waveOffset };
+  const waveWidth = frameWidth - pad - centerX - waveOffset;
+  layout = { portrait, frameHeight, radius, centerX, centerY: frameHeight / 2, waveOffset, waveWidth };
   trail = [];
 }
 
 function draw() {
   background(16, 20, 28);
-  const { radius, centerX, centerY, waveOffset, waveWidth } = layout;
+  const { portrait, frameHeight, radius, centerX, centerY, waveOffset, waveWidth } = layout;
   const speed = Number(speedInput.value);
   const samplesPerPeriod = ceil(TWO_PI / speed);
   const sampleSpacing = waveWidth / (PERIODS_SHOWN * samplesPerPeriod);
+  if (portrait) {
+    translate(width, 0);
+    rotate(HALF_PI);
+  }
   translate(centerX, centerY);
 
   // Near the jumps of the square and sawtooth waves the circles swing far sideways,
@@ -61,7 +70,7 @@ function draw() {
   const panelRight = waveOffset - 12;
   push();
   beginClip();
-  rect(-centerX, -centerY, centerX + panelRight, height);
+  rect(-centerX, -centerY, centerX + panelRight, frameHeight);
   endClip();
 
   noFill();
