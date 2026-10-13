@@ -1,110 +1,116 @@
-let angle;
-let wave;
-let shape;
+// Each term k contributes a circle with the given harmonic (rotation speed) and
+// amplitude, relative to a wave of height 1. These are the standard sine series.
+const SERIES = {
+  square: (k) => {
+    const n = 2 * k - 1;
+    return { harmonic: n, amplitude: 4 / (PI * n) };
+  },
+  sawtooth: (k) => ({ harmonic: k, amplitude: (k % 2 ? 2 : -2) / (PI * k) }),
+  triangle: (k) => {
+    const n = 2 * k - 1;
+    return { harmonic: n, amplitude: (k % 2 ? 8 : -8) / (PI * PI * n * n) };
+  },
+};
+const PERIODS_SHOWN = 2;
 
-const radius = 100;
-const waveLength = 900; // length of the vizualized wave
-const angularSpeed = 0.03;
+const waveSelect = document.getElementById('wave');
+const termsInput = document.getElementById('terms');
+const termsOutput = document.getElementById('terms-value');
+const speedInput = document.getElementById('speed');
+const stage = document.querySelector('.stage');
+
+let angle = 0;
+let trail = []; // newest first, positions of the outermost circle's tip
+let layout;
 
 function setup() {
-  let canvas = createCanvas(windowWidth, windowHeight);
-  canvas.parent('canvas-container');
+  createCanvas(stage.clientWidth, stage.clientHeight).parent(stage);
+  updateLayout();
+  new ResizeObserver(() => {
+    resizeCanvas(stage.clientWidth, stage.clientHeight);
+    updateLayout();
+  }).observe(stage);
 
-  angle = 0;
-  wave = [];
-  shape = [];
+  for (const input of [waveSelect, termsInput, speedInput]) {
+    input.addEventListener('input', () => {
+      termsOutput.value = termsInput.value;
+      trail = [];
+    });
+  }
+}
+
+function updateLayout() {
+  const pad = 16;
+  const radius = min(height * 0.3, width * 0.16);
+  const centerX = pad + radius * 1.5;
+  const waveOffset = radius * 1.9; // from the circles' center to the start of the wave
+  layout = { radius, centerX, centerY: height / 2, waveOffset, waveWidth: width - pad - centerX - waveOffset };
+  trail = [];
 }
 
 function draw() {
-  background(0);
-  translate(450, 450);
+  background(16, 20, 28);
+  const { radius, centerX, centerY, waveOffset, waveWidth } = layout;
+  const speed = Number(speedInput.value);
+  const samplesPerPeriod = ceil(TWO_PI / speed);
+  const sampleSpacing = waveWidth / (PERIODS_SHOWN * samplesPerPeriod);
+  translate(centerX, centerY);
 
-  squareWave(3);
-  // sawtoothWave(3);
+  // Near the jumps of the square and sawtooth waves the circles swing far sideways,
+  // so they are clipped to their own panel instead of spilling over the wave.
+  const panelRight = waveOffset - 12;
+  push();
+  beginClip();
+  rect(-centerX, -centerY, centerX + panelRight, height);
+  endClip();
 
-  wave = wave.slice(0, waveLength);
-  shape = shape.slice(0, waveLength);
-  angle -= angularSpeed;
-  angle %= TWO_PI;
-}
-
-function squareWave(numEpicycles) {
+  noFill();
   let x = 0;
   let y = 0;
+  for (let k = 1; k <= Number(termsInput.value); k++) {
+    const { harmonic, amplitude } = SERIES[waveSelect.value](k);
+    const r = radius * amplitude;
+    const nextX = x + r * cos(harmonic * angle);
+    const nextY = y + r * sin(harmonic * angle);
 
-  for (let n = 1; n < 2 * numEpicycles; n += 2) {
-    // previous circle's center
-    let prevX = x;
-    let prevY = y;
+    stroke(255, 255, 255, 40);
+    strokeWeight(1);
+    circle(x, y, 2 * abs(r));
+    stroke(255, 255, 255, 150);
+    line(x, y, nextX, nextY);
 
-    let r = radius * (4 / (n * PI));
-    x += r * cos(n * angle);
-    y += r * sin(n * angle);
-
-    stroke(255, 100);
-    noFill();
-    ellipse(prevX, prevY, 2 * r);
-
-    stroke(255, 200);
-    line(prevX, prevY, x, y);
+    x = nextX;
+    y = nextY;
   }
 
-  wave.unshift(y);
-  shape.push({ x, y });
-  drawImage(x, y);
-}
+  trail.unshift({ x, y });
+  trail.length = min(trail.length, PERIODS_SHOWN * samplesPerPeriod + 1);
 
-function sawtoothWave(numEpicycles) {
-  let x = 0;
-  let y = 0;
-  let sign = -1;
-
-  for (let n = 1; n <= numEpicycles; n++) {
-    // previous circle's center
-    let prevX = x;
-    let prevY = y;
-
-    let r = radius * (2 / (sign * n * PI));
-    x += r * cos(n * angle);
-    y += r * sin(n * angle);
-
-    stroke(255, 100);
-    noFill();
-    ellipse(prevX, prevY, 2 * r);
-
-    stroke(255, 100);
-    line(prevX, prevY, x, y);
-    sign *= -1;
-  }
-
-  wave.unshift(y);
-  shape.unshift({ x, y });
-  drawImage(x, y);
-}
-
-function drawImage(x, y) {
-  // line connecting the circle with the wave
-  let imageDistance = 400; // distance from the circle to the wave
-  line(x, y, imageDistance, y);
-
-  // drawing the shape around the circles
-  stroke(255, 0, 0);
+  strokeWeight(2);
+  stroke(245, 185, 66);
   beginShape();
-  noFill();
-  // NOTE: without the -1 it draws an auditional line
-  for (let i = 0; i < shape.length - 1; i++) {
-    vertex(shape[i].x, shape[i].y);
-  }
+  for (const tip of trail.slice(0, samplesPerPeriod + 1)) vertex(tip.x, tip.y);
   endShape();
 
-  translate(imageDistance, 0);
+  noStroke();
+  fill(245, 185, 66);
+  circle(x, y, 8);
+  pop();
 
-  // drawing the wave
-  stroke(255);
-  beginShape();
+  stroke(255, 255, 255, 70);
+  strokeWeight(1);
+  line(min(x, panelRight), y, waveOffset, y);
+
   noFill();
-  for (let i = 0; i < wave.length; i++) {
-    vertex(i, wave[i]);
-  }
+  strokeWeight(2);
+  stroke(94, 230, 160);
+  beginShape();
+  trail.forEach((tip, i) => vertex(waveOffset + i * sampleSpacing, tip.y));
   endShape();
+
+  noStroke();
+  fill(94, 230, 160);
+  circle(waveOffset, y, 8);
+
+  angle = (angle - speed) % TWO_PI;
 }
