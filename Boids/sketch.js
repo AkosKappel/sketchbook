@@ -1,6 +1,5 @@
-var boids;
+let boids;
 const visualRange = 75;
-const drawTrail = false;
 const numBoids = 100;
 const drawTail = true;
 

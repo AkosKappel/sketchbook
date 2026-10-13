@@ -3,12 +3,10 @@ class Boid {
     this.pos = createVector(random(1) * width, random(1) * height);
     this.vel = p5.Vector.fromAngle(random(TWO_PI));
     this.vel.mult(random(5));
-    this.color = color(137, 207, 240);
     this.history = [];
   }
 
   show() {
-    // this.drawDot();
     this.drawBoid();
   }
 
@@ -24,12 +22,11 @@ class Boid {
     this.matchVelocity();
     this.limitSpeed();
     this.keepWithinBounds();
-    // this.keepOnInfinitePlane();
     this.move();
   }
 
   keepWithinBounds() {
-    const padding = 200;
+    const padding = min(200, width * 0.15, height * 0.15);
     const turnFactor = 1;
 
     if (this.pos.x < padding) {
@@ -38,31 +35,11 @@ class Boid {
     if (this.pos.y < padding) {
       this.vel.y += turnFactor;
     }
-    if (this.pos.x > windowWidth - padding) {
+    if (this.pos.x > width - padding) {
       this.vel.x -= turnFactor;
     }
-    if (this.pos.y > windowHeight - padding) {
+    if (this.pos.y > height - padding) {
       this.vel.y -= turnFactor;
-    }
-  }
-
-  // keeps the boids on the surface of a torus
-  keepOnInfinitePlane() {
-    if (this.pos.x < 0) {
-      this.pos.x = windowWidth;
-      this.history = [];
-    }
-    if (this.pos.y < 0) {
-      this.pos.y = windowHeight;
-      this.history = [];
-    }
-    if (this.pos.x > windowWidth) {
-      this.pos.x = 0;
-      this.history = [];
-    }
-    if (this.pos.y > windowHeight) {
-      this.pos.y = 0;
-      this.history = [];
     }
   }
 
@@ -141,36 +118,23 @@ class Boid {
     }
   }
 
-  drawDot() {
-    stroke(this.color);
-    strokeWeight(10);
-    point(this.pos.x, this.pos.y);
-  }
-
   drawBoid() {
-    const ctx = document.getElementById('defaultCanvas0').getContext('2d');
-    const angle = atan2(this.vel.y, this.vel.x);
-
-    ctx.translate(this.pos.x, this.pos.y);
-    ctx.rotate(angle);
-    ctx.translate(-this.pos.x, -this.pos.y);
-    ctx.fillStyle = '#558cf4';
-    ctx.beginPath();
-    ctx.moveTo(this.pos.x, this.pos.y);
-    ctx.lineTo(this.pos.x - 15, this.pos.y + 5);
-    ctx.lineTo(this.pos.x - 15, this.pos.y - 5);
-    ctx.lineTo(this.pos.x, this.pos.y);
-    ctx.fill();
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-
     if (drawTail) {
-      ctx.strokeStyle = '#558cf466';
-      ctx.beginPath();
-      ctx.moveTo(this.history[0][0], this.history[0][1]);
-      for (const p of this.history) {
-        ctx.lineTo(p[0], p[1]);
+      stroke(85, 140, 244, 102);
+      noFill();
+      beginShape();
+      for (const [x, y] of this.history) {
+        vertex(x, y);
       }
-      ctx.stroke();
+      endShape();
     }
+
+    push();
+    translate(this.pos.x, this.pos.y);
+    rotate(this.vel.heading());
+    noStroke();
+    fill(85, 140, 244);
+    triangle(0, 0, -15, 5, -15, -5);
+    pop();
   }
 }
