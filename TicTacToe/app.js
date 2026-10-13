@@ -85,10 +85,6 @@ function drawO(x, y, r) {
   ellipse(x, y, r * 2);
 }
 
-function inRange(num, min, max) {
-  return num >= min && num <= max;
-}
-
 function randomMove() {
   let freeCells = getFreeCells();
   if (freeCells.length > 0) {
@@ -111,7 +107,7 @@ function getFreeCells() {
 
 function goodMove() {
   let winningMove = hasFinishingMove(currentPlayer);
-  let blockingMove = hasFinishingMove(getOppenent());
+  let blockingMove = hasFinishingMove(getOpponent());
 
   if (winningMove !== null) {
     board[winningMove.y][winningMove.x] = currentPlayer;
@@ -248,7 +244,7 @@ function minimax(maxDepth, isMaximizing, alpha = -Infinity, beta = Infinity) {
     for (let i = 0; i < board.length; i++) {
       for (let j = 0; j < board.length; j++) {
         if (board[i][j] === emptyCell) {
-          board[i][j] = getOppenent();
+          board[i][j] = getOpponent();
           let score = minimax(maxDepth - 1, true, alpha, beta);
           board[i][j] = emptyCell;
 
@@ -265,7 +261,7 @@ function minimax(maxDepth, isMaximizing, alpha = -Infinity, beta = Infinity) {
   }
 }
 
-function getOppenent() {
+function getOpponent() {
   if (currentPlayer === playerX) {
     return playerO;
   } else if (currentPlayer === playerO) {

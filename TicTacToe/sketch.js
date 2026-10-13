@@ -25,8 +25,12 @@ function draw() {
 }
 
 function mousePressed() {
+  if (result !== null) {
+    return; // game over, wait for "Play again"
+  }
+
   // click on canvas
-  if (inRange(mouseX, 0, cnvWidth) && inRange(mouseY, 0, cnvHeight)) {
+  if (mouseX >= 0 && mouseX < cnvWidth && mouseY >= 0 && mouseY < cnvHeight) {
     if (currentPlayer === human) {
       let j = floor(mouseX / cellWidth);
       let i = floor(mouseY / cellHeight);
