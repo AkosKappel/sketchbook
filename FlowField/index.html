@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flow Field · SketchBook</title>
+    <meta name="description" content="Thousands of particles drifting along a field of Perlin noise, painting flowing lines." />
+    <link rel="icon" href="../shared/favicon.svg" />
+    <link rel="stylesheet" href="../shared/base.css" />
+    <script defer src="../lib/p5.min.js"></script>
+    <script defer src="sketch.js"></script>
+  </head>
+  <body class="project">
+    <header class="topbar">
+      <a class="back" href="../">← All projects</a>
+      <h1>Flow Field</h1>
+      <p class="hint">Move your pointer or finger to stir the flow</p>
+    </header>
+    <main class="stage"></main>
+    <div class="controls">
+      <label>Particles <input type="range" id="count" min="500" max="6000" step="500" value="2500" /></label>
+      <label>Zoom <input type="range" id="zoom" min="1" max="10" value="4" /></label>
+      <label><input type="checkbox" id="fade" checked /> Fade trails</label>
+      <button class="primary" type="button" id="new-field">New field</button>
+    </div>
+  </body>
+</html>
