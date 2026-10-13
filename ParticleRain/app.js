@@ -11,14 +11,27 @@ canvas.width = width;
 canvas.height = height;
 fitCanvas(canvas, width, height);
 
-// The current image letterboxed into the canvas size, also drawn faintly when "Show source image" is on.
+// The current image letterboxed into the canvas size, also blended in faintly when "Show source image" is on.
 const source = document.createElement('canvas').getContext('2d', { willReadFrequently: true });
 source.canvas.width = width;
 source.canvas.height = height;
+let sourcePixels = new Uint8ClampedArray(width * height * 4);
 
-// Perceived brightness (0 to 2.55) and color of every pixel, indexed by y * width + x.
+// Perceived brightness (0 to 2.55) of every pixel, indexed by y * width + x.
 const brightness = new Float32Array(width * height);
-const colors = new Array(width * height).fill('#000');
+
+// Particles are blended straight into this pixel buffer instead of being drawn with canvas calls:
+// ten thousand fillStyle changes and fills per frame were too slow.
+const frame = ctx.createImageData(width, height);
+const pixels = frame.data;
+
+// Blends a color into one pixel of the frame with the given opacity (0 to 1).
+function blend(index, red, green, blue, alpha) {
+  const i = index * 4;
+  pixels[i] += (red - pixels[i]) * alpha;
+  pixels[i + 1] += (green - pixels[i + 1]) * alpha;
+  pixels[i + 2] += (blue - pixels[i + 2]) * alpha;
+}
 
 class Particle {
   constructor() {
@@ -43,13 +56,20 @@ class Particle {
     if (this.y >= height) this.reset();
   }
 
+  // A small dot in the color of the image underneath, more opaque over bright pixels.
   draw() {
     const pixel = this.pixel;
-    ctx.globalAlpha = Math.min(brightness[pixel] * 0.5, 1);
-    ctx.fillStyle = colors[pixel];
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-    ctx.fill();
+    const alpha = Math.min(brightness[pixel] * 0.5, 1);
+    if (alpha === 0) return;
+    const red = sourcePixels[pixel * 4];
+    const green = sourcePixels[pixel * 4 + 1];
+    const blue = sourcePixels[pixel * 4 + 2];
+    const r = this.size;
+    for (let y = Math.max(0, Math.ceil(this.y - r)); y <= Math.min(height - 1, this.y + r); y++) {
+      for (let x = Math.max(0, Math.ceil(this.x - r)); x <= Math.min(width - 1, this.x + r); x++) {
+        if ((x - this.x) ** 2 + (y - this.y) ** 2 <= r * r) blend(y * width + x, red, green, blue, alpha);
+      }
+    }
   }
 }
 
@@ -64,31 +84,35 @@ function mapImage(image) {
   source.fillRect(0, 0, width, height);
   source.drawImage(image, (width - imageWidth) / 2, (height - imageHeight) / 2, imageWidth, imageHeight);
 
-  const { data } = source.getImageData(0, 0, width, height);
+  sourcePixels = source.getImageData(0, 0, width, height).data;
   for (let i = 0; i < brightness.length; i++) {
-    const red = data[i * 4];
-    const green = data[i * 4 + 1];
-    const blue = data[i * 4 + 2];
+    const red = sourcePixels[i * 4];
+    const green = sourcePixels[i * 4 + 1];
+    const blue = sourcePixels[i * 4 + 2];
     brightness[i] = Math.sqrt(red * red * 0.299 + green * green * 0.587 + blue * blue * 0.114) / 100;
-    colors[i] = `rgb(${red} ${green} ${blue})`;
   }
-  ctx.fillStyle = '#000';
-  ctx.fillRect(0, 0, width, height);
+  // black, fully opaque
+  for (let i = 0; i < pixels.length; i++) pixels[i] = i % 4 === 3 ? 255 : 0;
 }
 
 function animate() {
-  ctx.globalAlpha = 0.05;
-  ctx.fillStyle = '#000';
-  ctx.fillRect(0, 0, width, height);
+  // Fading every pixel a little towards black leaves trails behind the particles. Rounding down
+  // (rather than to the nearest value) lets dim pixels reach black instead of leaving ghosts.
+  for (let i = 0; i < pixels.length; i += 4) {
+    pixels[i] = (pixels[i] * 243) >> 8;
+    pixels[i + 1] = (pixels[i + 1] * 243) >> 8;
+    pixels[i + 2] = (pixels[i + 2] * 243) >> 8;
+  }
   if (showImage.checked) {
-    ctx.globalAlpha = 0.04;
-    ctx.drawImage(source.canvas, 0, 0);
+    for (let i = 0; i < brightness.length; i++) {
+      blend(i, sourcePixels[i * 4], sourcePixels[i * 4 + 1], sourcePixels[i * 4 + 2], 0.04);
+    }
   }
   for (const particle of particles) {
     particle.update();
     particle.draw();
   }
-  ctx.globalAlpha = 1;
+  ctx.putImageData(frame, 0, 0);
   requestAnimationFrame(animate);
 }
 
