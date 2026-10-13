@@ -1,13 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Particle Rain</title>
-        <link rel="stylesheet" href="style.css">
-    </head>
-    <body>
-        <canvas id="canvas1"></canvas>
-        <script src="app.js"></script>
-    </body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Particle Rain · Mini Projects</title>
+    <link rel="icon" href="../shared/favicon.svg" />
+    <link rel="stylesheet" href="../shared/base.css" />
+    <script defer src="../shared/fit-canvas.js"></script>
+    <script defer src="app.js"></script>
+  </head>
+  <body class="project">
+    <header class="topbar">
+      <a class="back" href="../">← All projects</a>
+      <h1>Particle Rain</h1>
+      <p class="hint" id="hint">Rain falls slower over the bright parts of the image</p>
+    </header>
+    <main class="stage padded">
+      <canvas id="canvas"></canvas>
+    </main>
+    <div class="controls">
+      <button type="button" id="pick-image">Use your own image</button>
+      <input type="file" id="image-file" accept="image/*" hidden />
+      <button type="button" id="reset-image" hidden>Reset</button>
+      <label><input type="checkbox" id="show-image" /> Show source image</label>
+    </div>
+  </body>
 </html>
