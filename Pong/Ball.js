@@ -1,97 +1,58 @@
 class Ball {
-  constructor(radius = 25, speed = 10) {
-    this.r = radius;
-    this.initialSpeed = speed;
-    this.speed = speed;
-    this.resetAtCenter();
-    this.lastSpeedUp = 0;
-    this.color = color(255);
+  constructor() {
+    this.color = color(232, 235, 242);
+    this.serve(random([-1, 1]));
   }
 
-  resetAtCenter() {
-    this.speed = this.initialSpeed;
-    this.pos = createVector(windowWidth / 2, windowHeight / 2);
-    let randomAngle = random(-QUARTER_PI, QUARTER_PI) + random([0, PI]);
-    this.vel = p5.Vector.fromAngle(randomAngle);
-    this.vel.setMag(this.speed);
+  // sizes follow the canvas, so they stay right after a resize
+  get r() {
+    return max(6, min(width, height) * 0.02);
+  }
+
+  // capped so the ball can't skip past a paddle within one frame
+  get speed() {
+    return min(width * 0.007 * this.boost, this.r * 1.5);
+  }
+
+  serve(direction) {
+    this.pos = createVector(width / 2, height / 2);
+    this.boost = 1;
+    this.dir = p5.Vector.fromAngle(random(-QUARTER_PI, QUARTER_PI) + (direction < 0 ? PI : 0));
+    this.wait = 45; // frames before the ball moves, so players can get ready
   }
 
   show() {
+    noStroke();
     fill(this.color);
     circle(this.pos.x, this.pos.y, 2 * this.r);
   }
 
-  move() {
-    this.pos.add(this.vel);
-  }
-
   update() {
-    this.move();
-    this.keepWithinBounds();
-    this.speedUp();
+    if (this.wait > 0) {
+      this.wait--;
+      return;
+    }
+    this.pos.add(p5.Vector.mult(this.dir, this.speed));
+
+    if ((this.pos.y - this.r < 0 && this.dir.y < 0) || (this.pos.y + this.r > height && this.dir.y > 0)) {
+      this.dir.y *= -1;
+    }
   }
 
-  keepWithinBounds() {
-    // left and right boundary
-    if (this.pos.x - this.r < 0 || this.pos.x + this.r > windowWidth) {
-      if (this.pos.x - this.r < 0) {
-        stats.rightPlayerScore += stats.numBounces;
-      } else {
-        stats.leftPlayerScore += stats.numBounces;
-      }
-      stats.numBounces = 0;
-      this.resetAtCenter();
-    }
-    // top and bottom boundary
-    if (
-      (this.pos.y - this.r < 0 && this.vel.y < 0) ||
-      (this.pos.y + this.r > windowHeight && this.vel.y > 0)
-    ) {
-      this.vel.y *= -1;
-    }
+  // the side the ball left the court on, or null while it is in play
+  get missedSide() {
+    if (this.pos.x - this.r < 0) return SIDE.left;
+    if (this.pos.x + this.r > width) return SIDE.right;
+    return null;
   }
 
   bounceOff(paddle) {
-    stats.numBounces++;
-    const maxBounceAngle = QUARTER_PI;
+    // where the ball hits the paddle sets the angle: the edges send it off steeper
+    const offset = constrain((this.pos.y - paddle.y) / (paddle.h / 2), -1, 1);
+    let angle = offset * QUARTER_PI;
+    if (paddle.side === SIDE.right) angle = PI - angle;
 
-    const diff = constrain(this.pos.y - paddle.y, 0, paddle.height);
-
-    let bounceAngle = map(
-      diff,
-      0,
-      paddle.height,
-      -maxBounceAngle,
-      maxBounceAngle
-    );
-    if (paddle.side == SIDE.right) {
-      bounceAngle += PI;
-      bounceAngle *= -1;
-    }
-
-    this.vel = p5.Vector.fromAngle(bounceAngle);
-    this.vel.setMag(this.speed);
-  }
-
-  speedUp() {
-    if (millis() - this.lastSpeedUp > 5000) {
-      // capped so the ball can't skip past a paddle within one frame
-      this.speed = min(this.speed * 1.1, this.r * 1.5);
-      this.vel.setMag(this.speed);
-      this.lastSpeedUp = millis();
-    }
-  }
-
-  // returns the paddle which is expected to hit the ball next
-  getNextPaddle() {
-    // ball moves right
-    if (this.vel.x > 0) {
-      return rightPaddle;
-    }
-    // ball moves left
-    if (this.vel.x < 0) {
-      return leftPaddle;
-    }
-    return null;
+    this.dir = p5.Vector.fromAngle(angle);
+    this.boost *= 1.06;
   }
 }

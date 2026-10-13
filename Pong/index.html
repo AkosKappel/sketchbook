@@ -3,16 +3,36 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pong</title>
-    <link href="style.css" rel="stylesheet" />
-    <script src="../lib/p5.min.js"></script>
-    <script src="Ball.js"></script>
-    <script src="Paddle.js"></script>
-    <script src="sketch.js"></script>
+    <title>Pong · Mini Projects</title>
+    <link rel="icon" href="../shared/favicon.svg" />
+    <link rel="stylesheet" href="../shared/base.css" />
+    <script defer src="../lib/p5.min.js"></script>
+    <script defer src="Ball.js"></script>
+    <script defer src="Paddle.js"></script>
+    <script defer src="sketch.js"></script>
   </head>
-  <body>
-    <div id="canvas-container">
-      <!-- canvas goes here -->
-    </div>
+  <body class="project">
+    <header class="topbar">
+      <a class="back" href="../">← All projects</a>
+      <h1>Pong</h1>
+      <span class="stat"><span id="left-name">You</span> <output id="left-score">0</output></span>
+      <span class="stat"><span id="right-name">CPU</span> <output id="right-score">0</output></span>
+      <p class="hint"><kbd>W</kbd><kbd>S</kbd> <kbd>↑</kbd><kbd>↓</kbd> or drag to move, <kbd>Space</kbd> to pause</p>
+    </header>
+    <main class="stage">
+      <div class="overlay" id="overlay">
+        <h2 id="overlay-title">Pong</h2>
+        <p id="overlay-text">First to 7 wins. Press Space or tap to start</p>
+      </div>
+    </main>
+    <footer class="controls">
+      <label>
+        Mode
+        <select id="mode">
+          <option value="1" selected>1 player</option>
+          <option value="2">2 players</option>
+        </select>
+      </label>
+    </footer>
   </body>
 </html>
