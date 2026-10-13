@@ -3,40 +3,58 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Chaos Game</title>
-    <link href="style.css" rel="stylesheet" />
-    <script src="../lib/p5.min.js"></script>
-    <script src="sketch.js"></script>
+    <title>Chaos Game · Mini Projects</title>
+    <link rel="icon" href="../shared/favicon.svg" />
+    <link rel="stylesheet" href="../shared/base.css" />
+    <script defer src="../lib/p5.min.js"></script>
+    <script defer src="../shared/fit-canvas.js"></script>
+    <script defer src="sketch.js"></script>
   </head>
-  <body>
-    <div class="card">
-      <div class="card-body">
-        <label
-          >Number of points:
-          <select id="vertexCountField">
-            <option value="3" selected>3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-            <option value="10">10</option>
-          </select>
-        </label>
-        <label>Movement range: <input type="text" size="1" value="0.5" id="percentField" /></label>
-        <label>Repeat previous point: <input type="checkbox" id="canRepeat" checked /></label>
-        <label>Use colors: <input type="checkbox" id="useColors" checked /></label>
-        <label>Speed: <input type="range" min="1" max="500" value="100" id="speedSlider" /></label>
-        <br />
-        <label>
-          <button type="button" id="pause-btn">Pause</button>
-          <button type="button" id="start-btn">Start</button>
-        </label>
-      </div>
-      <div id="canvas-holder">
-        <!-- canvas goes here -->
-      </div>
+  <body class="project">
+    <header class="topbar">
+      <a class="back" href="../">← All projects</a>
+      <h1>Chaos Game</h1>
+      <span class="stat">Points <output id="points">0</output></span>
+      <p class="hint">Each dot jumps part of the way toward a random corner, and a fractal appears.</p>
+    </header>
+    <main class="stage padded"></main>
+    <div class="controls">
+      <label>
+        Preset
+        <select id="preset">
+          <option value="">Custom</option>
+          <option value="sierpinski">Sierpinski triangle</option>
+          <option value="square">Square, no repeat</option>
+          <option value="pentagon">Golden pentagon</option>
+          <option value="hexagon">Hexagon flake</option>
+        </select>
+      </label>
+      <label>
+        Corners
+        <select id="vertex-count">
+          <option>3</option>
+          <option>4</option>
+          <option>5</option>
+          <option>6</option>
+          <option>7</option>
+          <option>8</option>
+          <option>9</option>
+          <option>10</option>
+        </select>
+      </label>
+      <label>
+        Jump
+        <input id="ratio" type="range" min="0.1" max="0.9" step="0.001" value="0.5" />
+        <span class="stat"><output id="ratio-value"></output></span>
+      </label>
+      <label><input id="can-repeat" type="checkbox" checked /> Repeat corner</label>
+      <label><input id="use-colors" type="checkbox" checked /> Colors</label>
+      <label>
+        Speed
+        <input id="speed" type="range" min="10" max="3000" step="10" value="500" />
+      </label>
+      <button id="pause" type="button">Pause</button>
+      <button id="restart" class="primary" type="button">Restart</button>
     </div>
   </body>
 </html>

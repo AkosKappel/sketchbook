@@ -1,151 +1,147 @@
-let cnv;
-let vertexCountField;
-let percentField;
-let canRepeat;
-let useColors;
-let speedSlider;
-let startBtn;
-let pauseBtn;
+const SIZE = 900;
+const MARGIN = 24;
+const POINT_ALPHA = 90;
+// the first jumps land between the start and the attractor, so they are not drawn
+const WARMUP_STEPS = 20;
+const PALETTE = [
+  '#f5b942',
+  '#5ee6a0',
+  '#558cf4',
+  '#ff5c6c',
+  '#b38cff',
+  '#4fd6e0',
+  '#ff9b5e',
+  '#f27ec2',
+  '#a8e05f',
+  '#8fa6ff',
+];
+const PRESETS = {
+  sierpinski: { vertexCount: 3, ratio: 0.5, canRepeat: true },
+  square: { vertexCount: 4, ratio: 0.5, canRepeat: false },
+  pentagon: { vertexCount: 5, ratio: 0.618, canRepeat: true },
+  hexagon: { vertexCount: 6, ratio: 0.667, canRepeat: true },
+};
 
-let vertexColors;
+const presetSelect = document.getElementById('preset');
+const vertexCountSelect = document.getElementById('vertex-count');
+const ratioInput = document.getElementById('ratio');
+const ratioOutput = document.getElementById('ratio-value');
+const canRepeatInput = document.getElementById('can-repeat');
+const useColorsInput = document.getElementById('use-colors');
+const speedInput = document.getElementById('speed');
+const pauseButton = document.getElementById('pause');
+const restartButton = document.getElementById('restart');
+const pointsOutput = document.getElementById('points');
+
 let vertices;
-
 let current;
 let previousVertex;
-let percent;
-let stopped;
-
-// TODO: https://en.wikipedia.org/wiki/Chaos_game
+let steps;
+let paused = false;
+let plainColor;
 
 function setup() {
-  cnv = createCanvas(900, 900);
-  cnv.parent('canvas-holder');
+  const canvas = createCanvas(SIZE, SIZE);
+  canvas.parent(document.querySelector('.stage'));
+  fitCanvas(canvas.elt, SIZE, SIZE);
+  plainColor = color(232, 235, 242, POINT_ALPHA);
 
-  vertexCountField = document.getElementById('vertexCountField');
-  percentField = document.getElementById('percentField');
-  canRepeat = document.getElementById('canRepeat');
-  useColors = document.getElementById('useColors');
-  speedSlider = document.getElementById('speedSlider');
+  presetSelect.addEventListener('change', applyPreset);
+  for (const input of [vertexCountSelect, ratioInput, canRepeatInput, useColorsInput]) {
+    input.addEventListener('input', () => {
+      presetSelect.value = matchingPreset();
+      restart();
+    });
+  }
+  pauseButton.addEventListener('click', () => setPaused(!paused));
+  restartButton.addEventListener('click', restart);
 
-  startBtn = document.getElementById('start-btn');
-  startBtn.addEventListener('click', start);
-  pauseBtn = document.getElementById('pause-btn');
-  pauseBtn.addEventListener('click', pause);
-
-  start();
+  presetSelect.value = matchingPreset();
+  restart();
 }
 
 function draw() {
-  for (let i = 0; i < speedSlider.value; i++) {
-    chaosGame();
-  }
-}
+  const useColors = useColorsInput.checked;
+  const count = Number(speedInput.value);
 
-function chaosGame() {
-  let nextVertex = random(vertices);
+  for (let i = 0; i < count; i++) {
+    const vertex = nextVertex();
+    current.lerp(vertex.position, Number(ratioInput.value));
+    previousVertex = vertex;
+    steps++;
 
-  while (!canRepeat.checked && previousVertex === nextVertex) {
-    nextVertex = random(vertices);
-  }
-
-  current.x = lerp(current.x, nextVertex.pos.x, percent);
-  current.y = lerp(current.y, nextVertex.pos.y, percent);
-
-  if (useColors.checked) {
-    stroke(nextVertex.color);
-  } else {
-    stroke(0);
-  }
-
-  point(current.x, current.y);
-  previousVertex = nextVertex;
-}
-
-function start() {
-  background(255);
-  strokeWeight(1); // size of dots (in pixels)
-
-  stopped = true; // reset game
-  pause();
-
-  initColors(); // set colors
-  initVertices(); // set vertices
-
-  current = createVector(random(width), random(height));
-  percent = parseFloat(percentField.value);
-
-  if (isNaN(percent) || percent <= 0 || percent >= 1) {
-    percent = 0.5;
-  }
-
-  for (const v of vertices) {
-    v.show();
-  }
-}
-
-function pause() {
-  if (stopped) {
-    loop();
-    stopped = false;
-    pauseBtn.innerHTML = 'Pause';
-  } else {
-    noLoop();
-    stopped = true;
-    pauseBtn.innerHTML = 'Unpause';
-  }
-}
-
-function initVertices() {
-  vertices = [];
-  for (let i = 0; i < vertexCountField.value; i++) {
-    let angle = (i * TWO_PI) / vertexCountField.value - PI / 2.0;
-    vertices.push(new Vertex(angle, vertexColors[i]));
-  }
-}
-
-function initColors(shuffleColors = true) {
-  // basic colors
-  vertexColors = [
-    color(255, 0, 0),
-    color(0, 255, 0),
-    color(0, 0, 255),
-    color(255, 255, 0),
-    color(0, 255, 255),
-    color(255, 0, 255),
-  ];
-
-  // if not enough colors add more random
-  while (vertexColors.length < vertexCountField.value) {
-    let r = floor(random(1) * 256);
-    let g = floor(random(1) * 256);
-    let b = floor(random(1) * 256);
-    vertexColors.push(color(r, g, b));
-  }
-
-  // shuffle the colors
-  if (shuffleColors) {
-    let i = vertexColors.length;
-    while (--i) {
-      let j = floor(random(1) * (i + 1));
-      let temp = vertexColors[i];
-      vertexColors[i] = vertexColors[j];
-      vertexColors[j] = temp;
+    if (steps > WARMUP_STEPS) {
+      stroke(useColors ? vertex.color : plainColor);
+      point(current.x, current.y);
     }
   }
+
+  pointsOutput.value = max(0, steps - WARMUP_STEPS).toLocaleString('en-US');
 }
 
-class Vertex {
-  constructor(angle, c) {
-    this.pos = p5.Vector.fromAngle(angle);
-
-    this.pos.mult(min(width, height) / 2 - 10); // resize
-    this.pos.add(width / 2, height / 2); // move to center
-
-    this.color = color(c);
+function nextVertex() {
+  let vertex = random(vertices);
+  while (!canRepeatInput.checked && vertex === previousVertex) {
+    vertex = random(vertices);
   }
+  return vertex;
+}
 
-  show() {
-    stroke(this.color);
-    point(this.pos.x, this.pos.y);
+function restart() {
+  ratioOutput.value = Number(ratioInput.value).toFixed(3);
+  background(16, 20, 28);
+
+  // size and center the polygon by its bounding box, odd polygons are not symmetric vertically
+  const count = Number(vertexCountSelect.value);
+  const angles = Array.from({ length: count }, (_, i) => (i * TWO_PI) / count - HALF_PI);
+  const bottom = max(angles.map(sin));
+  const side = max(angles.map(cos));
+  const radius = min((SIZE - 2 * MARGIN) / (1 + bottom), (SIZE - 2 * MARGIN) / (2 * side));
+  const center = createVector(SIZE / 2, SIZE / 2 + (radius * (1 - bottom)) / 2);
+
+  vertices = [];
+  strokeWeight(10);
+  for (const angle of angles) {
+    const position = p5.Vector.fromAngle(angle, radius).add(center);
+    const vertexColor = color(PALETTE[vertices.length]);
+
+    stroke(useColorsInput.checked ? vertexColor : 'white');
+    point(position.x, position.y);
+
+    vertexColor.setAlpha(POINT_ALPHA);
+    vertices.push({ position, color: vertexColor });
   }
+  strokeWeight(1);
+
+  current = createVector(random(width), random(height));
+  previousVertex = null;
+  steps = 0;
+  pointsOutput.value = 0;
+  setPaused(false);
+}
+
+function setPaused(value) {
+  paused = value;
+  pauseButton.textContent = paused ? 'Resume' : 'Pause';
+  if (paused) noLoop();
+  else loop();
+}
+
+function applyPreset() {
+  const preset = PRESETS[presetSelect.value];
+  if (!preset) return;
+  vertexCountSelect.value = preset.vertexCount;
+  ratioInput.value = preset.ratio;
+  canRepeatInput.checked = preset.canRepeat;
+  restart();
+}
+
+function matchingPreset() {
+  const match = Object.entries(PRESETS).find(
+    ([, preset]) =>
+      preset.vertexCount === Number(vertexCountSelect.value) &&
+      preset.ratio === Number(ratioInput.value) &&
+      preset.canRepeat === canRepeatInput.checked,
+  );
+  return match ? match[0] : '';
 }
