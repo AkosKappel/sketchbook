@@ -55,7 +55,7 @@ class Ball {
     stats.numBounces++;
     const maxBounceAngle = QUARTER_PI;
 
-    let diff = abs(paddle.y - this.pos.y);
+    const diff = constrain(this.pos.y - paddle.y, 0, paddle.height);
 
     let bounceAngle = map(
       diff,
@@ -75,7 +75,8 @@ class Ball {
 
   speedUp() {
     if (millis() - this.lastSpeedUp > 5000) {
-      this.speed *= 1.1;
+      // capped so the ball can't skip past a paddle within one frame
+      this.speed = min(this.speed * 1.1, this.r * 1.5);
       this.vel.setMag(this.speed);
       this.lastSpeedUp = millis();
     }

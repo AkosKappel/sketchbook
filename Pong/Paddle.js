@@ -57,24 +57,17 @@ class Paddle {
   }
 
   checkCollision() {
-    if (this.side === SIDE.left) {
-      if (
-        ball.pos.x > this.x + this.width - ball.r &&
-        ball.pos.x < this.x + this.width + ball.r &&
-        ball.pos.y > this.y &&
-        ball.pos.y < this.y + this.height
-      ) {
-        ball.bounceOff(this);
-      }
-    } else if (this.side === SIDE.right) {
-      if (
-        ball.pos.x > this.x - ball.r &&
-        ball.pos.x < this.x + ball.r &&
-        ball.pos.y > this.y &&
-        ball.pos.y < this.y + this.height
-      ) {
-        ball.bounceOff(this);
-      }
+    // only bounce while the ball moves towards this paddle, otherwise one hit counts over several frames
+    const movingTowards = this.side === SIDE.left ? ball.vel.x < 0 : ball.vel.x > 0;
+    const faceX = this.side === SIDE.left ? this.x + this.width : this.x;
+
+    if (
+      movingTowards &&
+      abs(ball.pos.x - faceX) < ball.r &&
+      ball.pos.y > this.y - ball.r &&
+      ball.pos.y < this.y + this.height + ball.r
+    ) {
+      ball.bounceOff(this);
     }
   }
 
@@ -85,6 +78,7 @@ class Paddle {
     } else if (this.side === SIDE.right) {
       this.x = windowWidth - this.offset - this.width;
     }
+    this.y = constrain(this.y, 0, windowHeight - this.height);
   }
 }
 
