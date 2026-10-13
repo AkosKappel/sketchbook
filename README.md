@@ -1,19 +1,19 @@
 # SketchBook
 
-A collection of small browser experiments: classic games, simulations, fractals and canvas effects. Written while learning web development by following tutorials, then cleaned up, fixed and redesigned in 2026.
+A collection of small browser experiments: classic games, simulations, fractals and canvas effects. Most were written while learning web development by following tutorials, then cleaned up, fixed and redesigned in 2026. Minesweeper, Maze, Sorting, Mandelbrot and Flow Field were added in 2026.
 
 Live: https://akoskappel.github.io/sketchbook/
 
 | Category | Projects |
 | --- | --- |
-| Games | Snake, Pong, Tic Tac Toe |
-| Simulations | Game of Life, Boids, Genetic Algorithm, QuadTree |
-| Math and fractals | Chaos Game, Barnsley Fern, Fourier Series, Fractal Trees |
-| Effects | Particle Network, Animated Clouds, Spinning Stars, Particle Rain, Interactive Particles |
+| Games | Snake, Pong, Tic Tac Toe, Minesweeper |
+| Simulations and algorithms | Game of Life, Boids, Genetic Algorithm, QuadTree, Maze, Sorting |
+| Math and fractals | Chaos Game, Barnsley Fern, Fourier Series, Fractal Trees, Mandelbrot |
+| Effects | Particle Network, Animated Clouds, Spinning Stars, Particle Rain, Interactive Particles, Flow Field |
 
 ## Stack
 
-Plain HTML, CSS and JavaScript with no build step. The p5.js projects use a vendored copy of [p5.js](https://p5js.org/) 1.11 in `lib/`; the effects use the Canvas 2D API directly.
+Plain HTML, CSS and JavaScript with no build step. The p5.js projects use a vendored copy of [p5.js](https://p5js.org/) 1.11 in `lib/`; the rest use the Canvas 2D API or plain DOM elements directly.
 
 ## Structure
 
