@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Langton's Ant · SketchBook</title>
+    <meta name="description" content="An ant following two simple rules builds chaos, then an endless highway." />
+    <link rel="icon" href="../shared/favicon.svg" />
+    <link rel="stylesheet" href="../shared/base.css" />
+    <script defer src="../shared/fit-canvas.js"></script>
+    <script defer src="app.js"></script>
+  </head>
+  <body class="project">
+    <header class="topbar">
+      <a class="back" href="../">← All projects</a>
+      <h1>Langton's Ant</h1>
+      <span class="stat">Steps <output id="steps">0</output></span>
+      <span class="stat">Ants <output id="ants">1</output></span>
+      <p class="hint">Click or tap to add an ant</p>
+    </header>
+    <main class="stage">
+      <canvas id="canvas"></canvas>
+    </main>
+    <div class="controls">
+      <label>
+        Rule
+        <select id="rule">
+          <option value="RL">RL (classic)</option>
+          <option value="RLR">RLR (chaos)</option>
+          <option value="LLRR">LLRR (symmetric)</option>
+          <option value="LRRRRRLLR">LRRRRRLLR (square)</option>
+          <option value="RRLLLRLLLRRR">RRLLLRLLLRRR (triangle)</option>
+        </select>
+      </label>
+      <label>Speed <input type="range" id="speed" min="0" max="12" value="6" /></label>
+      <button type="button" id="pause">Pause</button>
+      <button class="primary" type="button" id="reset">Reset</button>
+    </div>
+  </body>
+</html>
