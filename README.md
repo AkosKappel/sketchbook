@@ -45,3 +45,10 @@ GitHub Pages serves the repository root from the `main` branch. `.nojekyll` turn
 
 Several projects follow tutorials by [The Coding Train](https://thecodingtrain.com/) (QuadTree, Fourier Series, Boids) and [Frank's Laboratory](https://www.youtube.com/@Frankslaboratory) (the canvas particle effects).
 
+## License
+
+The code is released under the [MIT License](LICENSE), with these exceptions:
+
+- `lib/p5.min.js` is [p5.js](https://github.com/processing/p5.js), licensed under the LGPL 2.1.
+- The default images `ParticleRain/octane.jpg` and `ImageIntoInteractiveParticles/vault-boy.png` belong to their respective owners and are not covered by the license.
+- The projects based on tutorials keep the credit above. The Coding Train's code is MIT licensed; Frank's Laboratory publishes no license terms for its tutorial code.
