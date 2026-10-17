@@ -42,6 +42,14 @@ const PROJECTS = [
     how: 'The mines are placed after your first click, never on or next to it, so every game starts with an open area. Each number counts the mines in the eight cells around it. Opening a cell with no mines nearby opens its neighbours too, which spreads across empty regions. Clicking a number whose mines are all flagged opens the rest of its neighbours.',
   },
   {
+    folder: '2048',
+    title: '2048',
+    category: 'game',
+    label: 'Game',
+    summary: 'Slide the tiles, merge equal numbers and try to reach 2048.',
+    how: 'Every move slides all tiles as far as they go in one direction. Two tiles with the same number that collide merge into one with double the value, and that value is added to your score. After each move a new 2 (or sometimes a 4) appears in an empty cell. A tile can only merge once per move, which is why sliding 2, 2, 4 gives 4, 4 and not 8. The game ends when the board is full and no neighbours match.',
+  },
+  {
     folder: 'GameOfLife',
     title: 'Game of Life',
     category: 'simulation',
@@ -90,6 +98,22 @@ const PROJECTS = [
     how: 'Each algorithm is written as a generator that pauses after every comparison and every write, so the animation can show one step at a time. The counters show the difference: bubble, insertion and selection sort need around n² comparisons, while merge sort, quicksort and heapsort get by with about n log n.',
   },
   {
+    folder: 'LangtonsAnt',
+    title: "Langton's Ant",
+    category: 'simulation',
+    label: 'Simulation',
+    summary: 'An ant with two rules makes chaos for 10,000 steps, then builds a highway.',
+    how: 'The ant stands on a grid of cells. On an empty cell it turns right, on a colored cell it turns left; either way it flips the color of the cell and steps forward. For about 10,000 steps the result looks random, then the ant suddenly settles into a pattern that repeats every 104 steps and builds a diagonal highway forever. Rules with more colors (each letter is the turn for one color) grow symmetric shapes, squares and triangles instead.',
+  },
+  {
+    folder: 'ReactionDiffusion',
+    title: 'Reaction-Diffusion',
+    category: 'simulation',
+    label: 'Simulation',
+    summary: 'Two virtual chemicals react and spread into coral, spots and mazes.',
+    how: 'Every cell holds an amount of two chemicals, A and B. Both spread out to the neighbouring cells, B a little slower. Where they meet, B turns A into more B, A is constantly fed in and B slowly removed. This Gray-Scott model was proposed as an explanation for patterns like animal stripes and spots. Only the feed and removal rates differ between the patterns; draw on the canvas to add B.',
+  },
+  {
     folder: 'ChaosGame',
     title: 'Chaos Game',
     category: 'math',
@@ -128,6 +152,14 @@ const PROJECTS = [
     label: 'Fractal',
     summary: 'Zoom into an endlessly detailed fractal made from one formula.',
     how: 'Every pixel stands for a number c. Starting from zero, the formula z = z² + c is repeated. If z stays small, the point belongs to the set and is drawn dark; if it escapes, the color shows how quickly. The image renders a few rows per frame so the page stays responsive, and the previous image is stretched into place while the next one renders.',
+  },
+  {
+    folder: 'DoublePendulum',
+    title: 'Double Pendulum',
+    category: 'math',
+    label: 'Physics',
+    summary: 'A pendulum on a pendulum: a tiny change at the start leads somewhere completely different.',
+    how: 'A second pendulum hangs from the end of the first. Its motion follows exact equations, solved in small time steps with the Runge-Kutta method, so there is no randomness at all. Still, the copies start only 0.001° apart and after a few swings move in completely different ways. That sensitivity to the starting point is what chaos means. Drag a bob to pick your own start.',
   },
   {
     folder: 'ParticleBackground',

@@ -1,14 +1,14 @@
 # SketchBook
 
-A collection of small browser experiments: classic games, simulations, fractals and canvas effects. Most were written while learning web development by following tutorials, then cleaned up, fixed and redesigned in 2026. Minesweeper, Maze, Sorting, Mandelbrot and Flow Field were added in 2026.
+A collection of small browser experiments: classic games, simulations, fractals and canvas effects. Most were written while learning web development by following tutorials, then cleaned up, fixed and redesigned in 2026. Minesweeper, 2048, Maze, Sorting, Langton's Ant, Reaction-Diffusion, Mandelbrot, Double Pendulum and Flow Field were added in 2026.
 
 Live: https://akoskappel.github.io/sketchbook/
 
 | Category | Projects |
 | --- | --- |
-| Games | Snake, Pong, Tic Tac Toe, Minesweeper |
-| Simulations and algorithms | Game of Life, Boids, Genetic Algorithm, QuadTree, Maze, Sorting |
-| Math and fractals | Chaos Game, Barnsley Fern, Fourier Series, Fractal Trees, Mandelbrot |
+| Games | Snake, Pong, Tic Tac Toe, Minesweeper, 2048 |
+| Simulations and algorithms | Game of Life, Boids, Genetic Algorithm, QuadTree, Maze, Sorting, Langton's Ant, Reaction-Diffusion |
+| Math and fractals | Chaos Game, Barnsley Fern, Fourier Series, Fractal Trees, Mandelbrot, Double Pendulum |
 | Effects | Particle Network, Animated Clouds, Spinning Stars, Particle Rain, Interactive Particles, Flow Field |
 
 ## Stack
@@ -44,3 +44,4 @@ GitHub Pages serves the repository root from the `main` branch. `.nojekyll` turn
 ## Credits
 
 Several projects follow tutorials by [The Coding Train](https://thecodingtrain.com/) (QuadTree, Fourier Series, Boids) and [Frank's Laboratory](https://www.youtube.com/@Frankslaboratory) (the canvas particle effects).
+
