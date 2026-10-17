@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reaction-Diffusion · SketchBook</title>
+    <meta name="description" content="Two simulated chemicals react and spread into coral, spots and maze-like patterns." />
+    <link rel="icon" href="../shared/favicon.svg" />
+    <link rel="stylesheet" href="../shared/base.css" />
+    <script defer src="../shared/fit-canvas.js"></script>
+    <script defer src="app.js"></script>
+  </head>
+  <body class="project">
+    <header class="topbar">
+      <a class="back" href="../">← All projects</a>
+      <h1>Reaction-Diffusion</h1>
+      <p class="hint">Draw to add chemical, change the pattern to see what the same rules can grow</p>
+    </header>
+    <main class="stage">
+      <canvas id="canvas"></canvas>
+    </main>
+    <div class="controls">
+      <label>
+        Pattern
+        <select id="pattern">
+          <option value="coral">Coral</option>
+          <option value="mitosis">Mitosis</option>
+          <option value="worms">Worms</option>
+          <option value="maze">Maze</option>
+        </select>
+      </label>
+      <label>Speed <input type="range" id="speed" min="1" max="30" value="12" /></label>
+      <button type="button" id="pause">Pause</button>
+      <button class="primary" type="button" id="reset">Reset</button>
+    </div>
+  </body>
+</html>
