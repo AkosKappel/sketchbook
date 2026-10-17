@@ -147,12 +147,40 @@ const devicePoint = (event) => {
 };
 
 // A press that barely moves is a click (zoom in), anything longer is a drag (pan).
+// Two fingers pinch: the point under their midpoint follows the midpoint, the scale follows their distance.
+const pointers = new Map(); // pointerId -> [x, y] in device pixels
 let drag = null;
+let pinch = null;
+
+function pinchState() {
+  const [[ax, ay], [bx, by]] = pointers.values();
+  return { mid: [(ax + bx) / 2, (ay + by) / 2], distance: Math.hypot(bx - ax, by - ay) };
+}
+
 canvas.addEventListener('pointerdown', (event) => {
   canvas.setPointerCapture(event.pointerId);
-  drag = { start: devicePoint(event), view: { ...view }, moved: false };
+  pointers.set(event.pointerId, devicePoint(event));
+  if (pointers.size === 1) {
+    drag = { start: devicePoint(event), view: { ...view }, moved: false };
+  } else if (pointers.size === 2) {
+    drag = null;
+    pinch = { ...pinchState(), view: { ...view } };
+  }
 });
 canvas.addEventListener('pointermove', (event) => {
+  if (!pointers.has(event.pointerId)) return;
+  pointers.set(event.pointerId, devicePoint(event));
+
+  if (pinch && pointers.size === 2) {
+    const { mid, distance } = pinchState();
+    const start = pinch.view;
+    const pointX = start.x + (pinch.mid[0] - width / 2) * start.scale;
+    const pointY = start.y + (pinch.mid[1] - height / 2) * start.scale;
+    const scale = (start.scale * pinch.distance) / Math.max(distance, 1);
+    setView({ x: pointX - (mid[0] - width / 2) * scale, y: pointY - (mid[1] - height / 2) * scale, scale });
+    return;
+  }
+
   if (!drag) return;
   const [x, y] = devicePoint(event);
   const dx = x - drag.start[0];
@@ -163,9 +191,16 @@ canvas.addEventListener('pointermove', (event) => {
 });
 canvas.addEventListener('pointerup', (event) => {
   if (drag && !drag.moved) zoomAt(...devicePoint(event), event.button === 2 || event.altKey ? 0.5 : 2);
-  drag = null;
+  endPointer(event);
 });
-canvas.addEventListener('pointercancel', () => (drag = null));
+canvas.addEventListener('pointercancel', endPointer);
+
+// After a pinch the remaining finger does nothing until it is lifted, so the gesture never ends in a jump.
+function endPointer(event) {
+  pointers.delete(event.pointerId);
+  drag = null;
+  if (pointers.size < 2) pinch = null;
+}
 canvas.addEventListener('contextmenu', (event) => event.preventDefault());
 canvas.addEventListener(
   'wheel',
