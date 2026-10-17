@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>2048 · SketchBook</title>
+    <meta name="description" content="Slide numbered tiles, merge equal pairs and try to reach the 2048 tile." />
+    <link rel="icon" href="../shared/favicon.svg" />
+    <link rel="stylesheet" href="../shared/base.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script defer src="app.js"></script>
+  </head>
+  <body class="project">
+    <header class="topbar">
+      <a class="back" href="../">← All projects</a>
+      <h1>2048</h1>
+      <span class="stat">Score <output id="score">0</output></span>
+      <span class="stat">Best <output id="best">0</output></span>
+      <p class="hint">Arrow keys, WASD or swipe to slide the tiles</p>
+    </header>
+    <main class="stage padded">
+      <div class="board" id="board"></div>
+      <div class="overlay" id="overlay" hidden>
+        <h2 id="overlay-title"></h2>
+        <p id="overlay-text"></p>
+        <div><button class="primary" type="button" id="overlay-button"></button></div>
+      </div>
+    </main>
+    <footer class="controls">
+      <span class="stat"><strong id="status" aria-live="polite">Merge equal tiles to reach 2048</strong></span>
+      <button class="primary" type="button" id="new-game">New game</button>
+    </footer>
+  </body>
+</html>

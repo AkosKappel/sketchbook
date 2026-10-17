@@ -1,0 +1,73 @@
+.board {
+  --gap: calc(var(--cell) * 0.12);
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, var(--cell));
+  gap: var(--gap);
+  padding: var(--gap);
+  border-radius: 10px;
+  background: var(--border);
+  box-shadow: 0 10px 40px rgb(0 0 0 / 0.5);
+  user-select: none;
+}
+
+.stage {
+  touch-action: none;
+}
+
+.slot {
+  width: var(--cell);
+  height: var(--cell);
+  border-radius: 6px;
+  background: #1a2334;
+}
+
+.tile {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  place-items: center;
+  width: var(--cell);
+  height: var(--cell);
+  border-radius: 6px;
+  background: var(--tile);
+  color: var(--tile-text, #0c111c);
+  font: 700 calc(var(--cell) * var(--font-scale, 0.42)) / 1 var(--mono);
+  transform: translate(
+    calc(var(--gap) + var(--x) * (var(--cell) + var(--gap))),
+    calc(var(--gap) + var(--y) * (var(--cell) + var(--gap)))
+  );
+  transition: transform 100ms ease-in-out;
+}
+
+.tile.leaving {
+  z-index: -1;
+}
+
+.tile.new {
+  animation: appear 150ms 100ms ease-out backwards;
+}
+
+.tile.merged {
+  animation: pop 150ms ease-out;
+}
+
+@keyframes appear {
+  from {
+    scale: 0;
+  }
+}
+
+@keyframes pop {
+  50% {
+    scale: 1.15;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile {
+    transition: none;
+    animation: none !important;
+  }
+}
