@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Double Pendulum · SketchBook</title>
+    <meta name="description" content="Chaos in a double pendulum: copies that start a hair apart soon swing completely differently." />
+    <link rel="icon" href="../shared/favicon.svg" />
+    <link rel="stylesheet" href="../shared/base.css" />
+    <script defer src="../shared/fit-canvas.js"></script>
+    <script defer src="app.js"></script>
+  </head>
+  <body class="project">
+    <header class="topbar">
+      <a class="back" href="../">← All projects</a>
+      <h1>Double Pendulum</h1>
+      <span class="stat">Time <output id="time">0.0 s</output></span>
+      <p class="hint">Drag a bob to set the start, every copy begins 0.001° apart</p>
+    </header>
+    <main class="stage">
+      <canvas id="canvas"></canvas>
+    </main>
+    <div class="controls">
+      <label>Copies <input type="range" id="copies" min="1" max="40" value="12" /></label>
+      <label>Trails <input type="checkbox" id="trails" checked /></label>
+      <button type="button" id="pause">Pause</button>
+      <button class="primary" type="button" id="restart">Random start</button>
+    </div>
+  </body>
+</html>
