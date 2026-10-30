@@ -1,5 +1,6 @@
 const BOARD_SIZE = 600;
 const BOT_DELAY = 300; // ms, so the bot's reply doesn't feel instant
+const DRAW_MS = 260; // how long a mark takes to draw itself
 const COLORS = {
   [playerX]: [245, 185, 66],
   [playerO]: [94, 230, 160],
@@ -12,6 +13,8 @@ let result = null;
 let winningLine = null;
 let hoverCell = null;
 let botTimer = null;
+const drawnAt = new Map(); // when each mark first appeared, by cell, to animate its strokes
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const statusText = document.getElementById('status');
 const difficulty = document.getElementById('difficulty');
@@ -80,6 +83,7 @@ function endTurn() {
   } else {
     tally[result === human ? 'wins' : 'losses']++;
     statusText.textContent = `${result} wins!`;
+    if (result === human) celebrateOver(document.querySelector('canvas'));
   }
   for (const [name, value] of Object.entries(tally)) {
     document.getElementById(name).value = value;
@@ -93,6 +97,7 @@ function newGame() {
   clearBoard();
   result = null;
   winningLine = null;
+  drawnAt.clear();
   statusText.textContent = 'Your turn';
 }
 
@@ -114,12 +119,17 @@ function drawGrid() {
 function drawCells() {
   for (let y = 0; y < board.length; y++) {
     for (let x = 0; x < board.length; x++) {
-      if (board[y][x] !== emptyCell) drawMark(board[y][x], { x, y }, 255);
+      if (board[y][x] === emptyCell) continue;
+      const key = y * board.length + x;
+      if (!drawnAt.has(key)) drawnAt.set(key, millis());
+      const progress = reducedMotion ? 1 : min(1, (millis() - drawnAt.get(key)) / DRAW_MS);
+      drawMark(board[y][x], { x, y }, 255, progress);
     }
   }
 }
 
-function drawMark(sign, cell, alpha) {
+// progress from 0 to 1 draws the mark stroke by stroke: the two lines of an X one after the other, an O as a growing arc
+function drawMark(sign, cell, alpha, progress = 1) {
   const { x, y } = cellCenter(cell);
   const r = cellSize * 0.26;
   stroke(...COLORS[sign], alpha);
@@ -127,8 +137,12 @@ function drawMark(sign, cell, alpha) {
   strokeCap(ROUND);
   noFill();
   if (sign === playerX) {
-    line(x - r, y - r, x + r, y + r);
-    line(x - r, y + r, x + r, y - r);
+    const first = min(1, progress * 2);
+    const second = max(0, progress * 2 - 1);
+    line(x - r, y - r, x - r + 2 * r * first, y - r + 2 * r * first);
+    if (second > 0) line(x + r, y - r, x + r - 2 * r * second, y - r + 2 * r * second);
+  } else if (progress < 1) {
+    arc(x, y, r * 2.1, r * 2.1, -HALF_PI, -HALF_PI + TWO_PI * progress);
   } else {
     circle(x, y, r * 2.1);
   }
