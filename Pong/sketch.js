@@ -7,6 +7,9 @@ let scores = { left: 0, right: 0 };
 let players = 1;
 let aiAim = 0; // how far off center the AI aims, so it misses now and then
 let state = 'ready'; // ready | running | paused | over
+let sparks = []; // { x, y, vx, vy, life, color } flying from where a point was scored
+let shake = 0; // frames of screen shake left
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const stage = document.querySelector('.stage');
 const overlay = document.getElementById('overlay');
@@ -55,10 +58,18 @@ function draw() {
   if (state === 'running') update();
 
   background(22, 27, 38);
+  push();
+  if (shake > 0) {
+    const strength = shake * min(width, height) * 0.0012;
+    translate(random(-strength, strength), random(-strength, strength));
+    shake--;
+  }
   drawNet();
   leftPaddle.show();
   rightPaddle.show();
   ball.show();
+  drawSparks();
+  pop();
 }
 
 function update() {
@@ -80,12 +91,42 @@ function update() {
     const scorer = missed === SIDE.left ? SIDE.right : SIDE.left;
     scores[scorer]++;
     showScores();
+    burst(missed, (scorer === SIDE.left ? leftPaddle : rightPaddle).color);
     if (scores[scorer] >= WINNING_SCORE) {
       setState('over');
+      if (players === 2 || scorer === SIDE.left) celebrateOver(document.querySelector('canvas'));
     } else {
       ball.serve(missed === SIDE.left ? -1 : 1); // serve towards the player who missed
     }
   }
+}
+
+// sparks fly back into the court from the edge the ball left through, and the court shakes a little
+function burst(side, sparkColor) {
+  if (reducedMotion) return;
+  const x = side === SIDE.left ? 0 : width;
+  const inward = side === SIDE.left ? 1 : -1;
+  const speed = min(width, height) * 0.012;
+  for (let i = 0; i < 36; i++) {
+    const angle = random(-HALF_PI, HALF_PI) + (inward < 0 ? PI : 0);
+    const v = p5.Vector.fromAngle(angle, random(0.3, 1) * speed);
+    sparks.push({ x, y: ball.pos.y, vx: v.x, vy: v.y, life: 1, color: sparkColor });
+  }
+  shake = 14;
+}
+
+function drawSparks() {
+  strokeWeight(max(2, min(width, height) * 0.005));
+  for (const spark of sparks) {
+    spark.x += spark.vx;
+    spark.y += spark.vy;
+    spark.vx *= 0.94;
+    spark.vy *= 0.94;
+    spark.life -= 0.025;
+    stroke(red(spark.color), green(spark.color), blue(spark.color), 255 * spark.life);
+    line(spark.x, spark.y, spark.x - spark.vx * 2, spark.y - spark.vy * 2);
+  }
+  sparks = sparks.filter((spark) => spark.life > 0);
 }
 
 function updateAi() {
