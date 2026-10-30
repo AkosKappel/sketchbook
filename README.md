@@ -1,13 +1,13 @@
 # SketchBook
 
-A collection of small browser experiments: classic games, simulations, fractals and canvas effects. Most were written while learning web development by following tutorials, then cleaned up, fixed and redesigned in 2026. Minesweeper, 2048, Maze, Sorting, Langton's Ant, Reaction-Diffusion, Mandelbrot, Double Pendulum and Flow Field were added in 2026.
+A collection of small browser experiments: classic games, simulations, fractals and canvas effects. Most were written while learning web development by following tutorials, then cleaned up, fixed and redesigned in 2026. Minesweeper, 2048, Maze, Sorting, Langton's Ant, Reaction-Diffusion, Mandelbrot, Double Pendulum, Flow Field, Breakout, Connect Four, Blocks, Asteroids and Falling Sand were added in 2026.
 
 Live: https://akoskappel.github.io/sketchbook/
 
 | Category | Projects |
 | --- | --- |
-| Games | Snake, Pong, Tic Tac Toe, Minesweeper, 2048 |
-| Simulations and algorithms | Game of Life, Boids, Genetic Algorithm, QuadTree, Maze, Sorting, Langton's Ant, Reaction-Diffusion |
+| Games | Snake, Pong, Tic Tac Toe, Minesweeper, 2048, Breakout, Connect Four, Blocks, Asteroids |
+| Simulations and algorithms | Game of Life, Boids, Genetic Algorithm, QuadTree, Maze, Sorting, Langton's Ant, Reaction-Diffusion, Falling Sand |
 | Math and fractals | Chaos Game, Barnsley Fern, Fourier Series, Fractal Trees, Mandelbrot, Double Pendulum |
 | Effects | Particle Network, Animated Clouds, Spinning Stars, Particle Rain, Interactive Particles, Flow Field |
 
@@ -21,7 +21,7 @@ Plain HTML, CSS and JavaScript with no build step. The p5.js projects use a vend
 index.html          landing page
 projects.js         project and category list the landing page is rendered from
 collection.js       renders the filters and project cards
-shared/             base stylesheet, canvas sizing and image input helpers, favicon
+shared/             base stylesheet, canvas sizing, image input and confetti helpers, favicon
 lib/p5.min.js       p5.js 1.11.13
 thumbs/             landing page previews
 <Project>/          one folder per project, opened via <Project>/index.html
