@@ -112,6 +112,7 @@ function move(dx, dy) {
     reachedGoal = true;
     state = 'won';
     showOverlay('You made 2048!', `Score ${score}. Keep going for a bigger tile?`, 'Keep going');
+    celebrateOver(boardElement);
   } else if (!canMove()) {
     state = 'over';
     statusOutput.textContent = 'No moves left';
