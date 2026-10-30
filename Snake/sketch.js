@@ -1,8 +1,16 @@
 let cellSize;
 let snake;
 let apple;
-let state = 'ready'; // ready | running | paused | over
+let state = 'ready'; // ready | running | paused | dying | over
 let best = loadBest();
+let moveFrames = 0;
+let dyingFrames = 0;
+let pieces = []; // the body segments flying apart after a crash
+
+const MOVE_EVERY = 6; // frames per step at 60 fps, 10 steps a second
+const FLASH_FRAMES = 24;
+const BREAK_FRAMES = 45;
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const stage = document.querySelector('.stage');
 const overlay = document.getElementById('overlay');
@@ -16,7 +24,7 @@ const rows = () => floor(height / cellSize);
 
 function setup() {
   createCanvas(1, 1).parent(stage);
-  frameRate(10);
+  frameRate(60);
 
   newGame();
   bestOutput.value = best;
@@ -65,7 +73,8 @@ function newGame() {
 }
 
 function draw() {
-  if (state === 'running') {
+  if (state === 'running' && ++moveFrames >= MOVE_EVERY) {
+    moveFrames = 0;
     snake.update();
     scoreOutput.value = snake.score;
     if (snake.dead) {
@@ -75,7 +84,47 @@ function draw() {
 
   drawBoard();
   apple.show();
-  snake.show();
+  if (state === 'dying') {
+    drawDeath();
+  } else {
+    snake.show();
+  }
+}
+
+// The snake flashes a few times, then its segments fly apart and fade before the game over screen.
+function drawDeath() {
+  dyingFrames--;
+  if (dyingFrames >= BREAK_FRAMES) {
+    if (floor(dyingFrames / 4) % 2 === 0) snake.show();
+  } else {
+    if (pieces.length === 0) {
+      pieces = snake.body.map((part) => ({
+        x: part.x + cellSize / 2,
+        y: part.y + cellSize / 2,
+        vx: random(-1, 1) * cellSize * 0.25,
+        vy: random(-1.2, 0.2) * cellSize * 0.25,
+        angle: 0,
+        spin: random(-0.3, 0.3),
+      }));
+    }
+    const alpha = 255 * (dyingFrames / BREAK_FRAMES);
+    noStroke();
+    rectMode(CENTER);
+    for (const piece of pieces) {
+      piece.vy += cellSize * 0.02;
+      piece.x += piece.vx;
+      piece.y += piece.vy;
+      piece.angle += piece.spin;
+      push();
+      translate(piece.x, piece.y);
+      rotate(piece.angle);
+      fill(red(snake.color), green(snake.color), blue(snake.color), alpha);
+      rect(0, 0, cellSize - 2, cellSize - 2, 6);
+      pop();
+    }
+    rectMode(CORNER);
+  }
+  if (dyingFrames <= 0) setState('over');
 }
 
 function drawBoard() {
@@ -92,7 +141,13 @@ function gameOver() {
     saveBest(best);
     bestOutput.value = best;
   }
-  setState('over');
+  if (reducedMotion) {
+    setState('over');
+  } else {
+    pieces = [];
+    dyingFrames = FLASH_FRAMES + BREAK_FRAMES;
+    setState('dying');
+  }
 }
 
 function setState(next) {
@@ -102,19 +157,20 @@ function setState(next) {
     paused: ['Paused', 'Press Space or tap to continue'],
     over: ['Game over', `Score ${snake.score}. Press Space or tap to play again`],
   };
-  overlay.hidden = state === 'running';
+  overlay.hidden = !messages[state];
   if (messages[state]) {
     [overlayTitle.textContent, overlayText.textContent] = messages[state];
   }
 }
 
 function handleDirection(direction) {
-  if (state === 'over') return;
+  if (state === 'over' || state === 'dying') return;
   snake.turn(direction);
   if (state !== 'running') setState('running');
 }
 
 function handleAction() {
+  if (state === 'dying') return;
   if (state === 'running') {
     setState('paused');
   } else if (state === 'over') {

@@ -8,7 +8,9 @@ class Apple {
   show() {
     noStroke();
     fill(this.color);
-    circle(this.pos.x + cellSize / 2, this.pos.y + cellSize / 2, cellSize * 0.7);
+    // a gentle pulse, about one beat a second
+    const pulse = reducedMotion ? 1 : 1 + 0.08 * sin(millis() / 160);
+    circle(this.pos.x + cellSize / 2, this.pos.y + cellSize / 2, cellSize * 0.7 * pulse);
   }
 
   setRandomPosition() {
