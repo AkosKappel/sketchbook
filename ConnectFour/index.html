@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Connect Four · SketchBook</title>
+    <meta name="description" content="Drop discs against a minimax bot and line up four before it does." />
+    <link rel="icon" href="../shared/favicon.svg" />
+    <link rel="stylesheet" href="../shared/base.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script defer src="../shared/celebrate.js"></script>
+    <script defer src="game.js"></script>
+    <script defer src="app.js"></script>
+  </head>
+  <body class="project">
+    <header class="topbar">
+      <a class="back" href="../">← All projects</a>
+      <h1>Connect Four</h1>
+      <span class="stat">Wins <output id="wins">0</output></span>
+      <span class="stat">Losses <output id="losses">0</output></span>
+      <span class="stat">Draws <output id="draws">0</output></span>
+      <p class="hint">Click a column, or use <kbd>←</kbd> <kbd>→</kbd> and <kbd>Enter</kbd>, or keys 1 to 7</p>
+    </header>
+    <main class="stage padded">
+      <div class="board" id="board" role="group" aria-label="Board, seven columns"></div>
+    </main>
+    <footer class="controls">
+      <span class="stat"><strong id="status" aria-live="polite">Your turn</strong></span>
+      <label>
+        Difficulty
+        <select id="difficulty">
+          <option value="easy">Easy</option>
+          <option value="medium" selected>Medium</option>
+          <option value="hard">Hard</option>
+        </select>
+      </label>
+      <label>
+        First move
+        <select id="first">
+          <option value="alternate">Take turns</option>
+          <option value="human">You</option>
+          <option value="bot">Bot</option>
+        </select>
+      </label>
+      <button class="primary" type="button" id="new-game">New game</button>
+    </footer>
+  </body>
+</html>

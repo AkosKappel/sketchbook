@@ -1,0 +1,134 @@
+.board {
+  --gap: calc(var(--cell) * 0.14);
+  --human: #f5b942;
+  --bot: #ff7a90;
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: repeat(7, var(--cell));
+  column-gap: var(--gap);
+  padding: 0 var(--gap) var(--gap);
+  user-select: none;
+}
+
+/* the blue frame sits below the ghost row, so a ghost disc appears to hover above the board */
+.board::before {
+  content: '';
+  position: absolute;
+  inset: var(--cell) 0 0;
+  z-index: -1;
+  border-radius: calc(var(--cell) * 0.22);
+  background: #2b3850;
+  box-shadow: 0 10px 40px rgb(0 0 0 / 0.5);
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: calc(var(--cell) * 0.5);
+  background: none;
+  touch-action: manipulation;
+}
+
+.column:focus-visible {
+  outline-offset: calc(var(--gap) * 0.4);
+}
+
+.board.locked .column {
+  cursor: default;
+}
+
+.ghost,
+.slot {
+  position: relative;
+  width: var(--cell);
+  height: var(--cell);
+  border-radius: 50%;
+}
+
+.slot {
+  background: var(--bg);
+  box-shadow: inset 0 calc(var(--cell) * 0.06) calc(var(--cell) * 0.1) rgb(0 0 0 / 0.6);
+}
+
+.ghost {
+  background: var(--human);
+  opacity: 0;
+  scale: 0.8;
+  transition: opacity 120ms, scale 120ms;
+}
+
+.column:focus-visible .ghost {
+  opacity: 0.35;
+  scale: 1;
+}
+
+@media (hover: hover) {
+  .column:hover .ghost {
+    opacity: 0.35;
+    scale: 1;
+  }
+}
+
+.board.locked .ghost {
+  opacity: 0;
+}
+
+.disc {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: inset 0 calc(var(--cell) * -0.06) 0 rgb(0 0 0 / 0.25), inset 0 0 0 calc(var(--cell) * 0.1) rgb(255 255 255 / 0.12);
+  animation: fall calc(220ms + var(--fall) * 40ms) cubic-bezier(0.5, 0, 0.75, 0) both;
+}
+
+.disc.human {
+  background: var(--human);
+}
+
+.disc.bot {
+  background: var(--bot);
+}
+
+/* the disc falls from the ghost row, then a short bounce once it hits the bottom of its hole */
+@keyframes fall {
+  from {
+    transform: translateY(calc(var(--fall) * -1 * (var(--cell) + var(--gap))));
+  }
+  70% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.3, 0.6, 0.6, 1);
+  }
+  85% {
+    transform: translateY(calc(var(--cell) * -0.12));
+    animation-timing-function: cubic-bezier(0.5, 0, 0.75, 0);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.board.has-winner .slot:not(.win) .disc {
+  opacity: 0.4;
+  transition: opacity 300ms 400ms;
+}
+
+.slot.win .disc {
+  box-shadow: 0 0 0 calc(var(--cell) * 0.07) var(--text), 0 0 calc(var(--cell) * 0.4) var(--text);
+  transition: box-shadow 300ms 400ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .disc {
+    animation: none;
+  }
+
+  .ghost,
+  .board.has-winner .slot .disc {
+    transition: none;
+  }
+}
