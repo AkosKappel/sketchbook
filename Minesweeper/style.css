@@ -35,6 +35,7 @@
 
 .cell.mine {
   background: #5c2230;
+  animation: burst 250ms ease-out;
 }
 
 .cell.mine.hit {
@@ -58,6 +59,19 @@
 .n6 { color: #5ed8e6; }
 .n7 { color: #e8ebf2; }
 .n8 { color: #9aa3b5; }
+
+@keyframes burst {
+  from {
+    scale: 0.4;
+    background: #ff5c6c;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cell.mine {
+    animation: none;
+  }
+}
 
 #flag-mode[aria-pressed='true'] {
   border-color: var(--accent);

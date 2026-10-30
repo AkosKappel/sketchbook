@@ -23,6 +23,7 @@ let openCount = 0;
 let startTime = 0;
 let timer = null;
 let flagMode = false;
+let revealTimers = [];
 
 function newGame() {
   level = LEVELS[difficultySelect.value];
@@ -31,6 +32,8 @@ function newGame() {
   [cols, rows] = portrait && level.cols > level.rows ? [level.rows, level.cols] : [level.cols, level.rows];
 
   clearInterval(timer);
+  revealTimers.forEach(clearTimeout);
+  revealTimers = [];
   state = 'ready';
   openCount = 0;
   timeOutput.value = 0;
@@ -158,20 +161,32 @@ function win() {
     }
   });
   updateMinesLeft();
+  celebrateOver(boardElement);
 }
 
 function lose(hitIndex) {
   state = 'lost';
   clearInterval(timer);
   statusOutput.textContent = 'Boom. Press New game to try again';
-  // show every unflagged mine and mark the flags that were wrong
-  cells.forEach((cell, index) => {
-    if (cell.mine !== cell.flag) {
-      cell.open = cell.mine;
-      render(index);
-    }
-  });
+  cells[hitIndex].open = true;
+  render(hitIndex);
   cells[hitIndex].button.classList.add('hit');
+
+  // the other unflagged mines and the wrong flags show up one after another, spreading out from the hit
+  const hitX = hitIndex % cols;
+  const hitY = Math.floor(hitIndex / cols);
+  const distance = (index) => Math.hypot((index % cols) - hitX, Math.floor(index / cols) - hitY);
+  const shown = cells.flatMap((cell, index) => (cell.mine !== cell.flag && index !== hitIndex ? [index] : []));
+  const farthest = Math.max(1, ...shown.map(distance));
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  for (const index of shown) {
+    const show = () => {
+      cells[index].open = cells[index].mine;
+      render(index);
+    };
+    if (reducedMotion) show();
+    else revealTimers.push(setTimeout(show, (distance(index) / farthest) * 900));
+  }
 }
 
 function render(index) {
