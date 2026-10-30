@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Breakout · SketchBook</title>
+    <meta name="description" content="Bounce the ball off your paddle and break every brick, level after level." />
+    <link rel="icon" href="../shared/favicon.svg" />
+    <link rel="stylesheet" href="../shared/base.css" />
+    <script defer src="../shared/fit-canvas.js"></script>
+    <script defer src="../shared/celebrate.js"></script>
+    <script defer src="app.js"></script>
+  </head>
+  <body class="project">
+    <header class="topbar">
+      <a class="back" href="../">← All projects</a>
+      <h1>Breakout</h1>
+      <span class="stat">Score <output id="score">0</output></span>
+      <span class="stat">Lives <output id="lives">3</output></span>
+      <span class="stat">Level <output id="level">1</output></span>
+      <span class="stat">Best <output id="best">0</output></span>
+      <p class="hint"><kbd>←</kbd><kbd>→</kbd> <kbd>A</kbd><kbd>D</kbd> or pointer to move, <kbd>Space</kbd> to pause</p>
+    </header>
+    <main class="stage">
+      <canvas id="canvas"></canvas>
+      <div class="overlay" id="overlay">
+        <h2 id="overlay-title">Breakout</h2>
+        <p id="overlay-text">Clear every brick. Press Space or tap to start</p>
+      </div>
+    </main>
+  </body>
+</html>
