@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blocks · SketchBook</title>
+    <meta name="description" content="Stack falling blocks, fill whole rows to clear them and keep the well from overflowing." />
+    <link rel="icon" href="../shared/favicon.svg" />
+    <link rel="stylesheet" href="../shared/base.css" />
+    <script defer src="../shared/fit-canvas.js"></script>
+    <script defer src="../shared/celebrate.js"></script>
+    <script defer src="game.js"></script>
+    <script defer src="app.js"></script>
+  </head>
+  <body class="project">
+    <header class="topbar">
+      <a class="back" href="../">← All projects</a>
+      <h1>Blocks</h1>
+      <span class="stat">Score <output id="score">0</output></span>
+      <span class="stat">Lines <output id="lines">0</output></span>
+      <span class="stat">Level <output id="level">1</output></span>
+      <span class="stat">Best <output id="best">0</output></span>
+      <p class="hint"><kbd>←</kbd><kbd>→</kbd> move, <kbd>↑</kbd><kbd>Z</kbd> rotate, <kbd>Space</kbd> drop, <kbd>C</kbd> hold, <kbd>P</kbd> pause</p>
+    </header>
+    <main class="stage">
+      <canvas id="canvas" aria-label="Game well"></canvas>
+      <div class="overlay" id="overlay">
+        <h2 id="overlay-title">Blocks</h2>
+        <p id="overlay-text">Fill whole rows to clear them. Press Space or tap to start</p>
+      </div>
+    </main>
+    <footer class="controls">
+      <button type="button" id="hold">Hold</button>
+      <button type="button" id="pause">Pause</button>
+    </footer>
+  </body>
+</html>
