@@ -1,0 +1,60 @@
+.materials {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+
+.materials button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 11px;
+}
+
+.materials button[aria-pressed='true'] {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+.swatch.sand {
+  background: #f5b942;
+}
+
+.swatch.water {
+  background: #7aa7ff;
+}
+
+.swatch.stone {
+  background: #7c8496;
+}
+
+.swatch.wood {
+  background: #a0704a;
+}
+
+.swatch.fire {
+  background: #ff7a50;
+}
+
+.swatch.eraser {
+  border: 1px solid var(--muted);
+}
+
+@media (max-width: 640px) {
+  .controls {
+    gap: 8px 12px;
+    padding: 10px 12px;
+  }
+
+  .materials button {
+    padding: 6px 9px;
+    font-size: 13px;
+  }
+}

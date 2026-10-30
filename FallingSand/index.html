@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Falling Sand · SketchBook</title>
+    <meta name="description" content="A powder toy: paint sand, water, stone, wood and fire and watch them pile, flow and burn." />
+    <link rel="icon" href="../shared/favicon.svg" />
+    <link rel="stylesheet" href="../shared/base.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script defer src="../shared/fit-canvas.js"></script>
+    <script defer src="app.js"></script>
+  </head>
+  <body class="project">
+    <header class="topbar">
+      <a class="back" href="../">← All projects</a>
+      <h1>Falling Sand</h1>
+      <span class="stat">Particles <output id="count">0</output></span>
+      <p class="hint">Pick a material and paint, hold still to keep pouring</p>
+    </header>
+    <main class="stage">
+      <canvas id="canvas"></canvas>
+    </main>
+    <footer class="controls">
+      <div class="materials" role="group" aria-label="Material">
+        <button type="button" data-material="1" aria-pressed="true"><span class="swatch sand"></span>Sand</button>
+        <button type="button" data-material="2" aria-pressed="false"><span class="swatch water"></span>Water</button>
+        <button type="button" data-material="3" aria-pressed="false"><span class="swatch stone"></span>Stone</button>
+        <button type="button" data-material="4" aria-pressed="false"><span class="swatch wood"></span>Wood</button>
+        <button type="button" data-material="5" aria-pressed="false"><span class="swatch fire"></span>Fire</button>
+        <button type="button" data-material="0" aria-pressed="false"><span class="swatch eraser"></span>Eraser</button>
+      </div>
+      <label>Brush <input type="range" id="brush" min="1" max="12" value="4" /></label>
+      <button type="button" id="pause">Pause</button>
+      <button type="button" id="clear">Clear</button>
+    </footer>
+  </body>
+</html>
