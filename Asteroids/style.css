@@ -1,0 +1,70 @@
+.stage {
+  background: rgb(14 18 27);
+}
+
+.stage canvas {
+  position: absolute;
+  inset: 0;
+}
+
+/* On-screen controls, only on touch screens */
+
+.touch {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 16px;
+  pointer-events: none;
+}
+
+.touch-group {
+  display: flex;
+  gap: 10px;
+}
+
+.touch button {
+  width: 60px;
+  height: 60px;
+  padding: 0;
+  border: 1px solid rgb(232 235 242 / 0.25);
+  border-radius: 50%;
+  background: rgb(232 235 242 / 0.08);
+  color: rgb(232 235 242 / 0.8);
+  font-size: 20px;
+  pointer-events: auto;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.touch button.active {
+  border-color: rgb(245 185 66 / 0.7);
+  background: rgb(245 185 66 / 0.25);
+}
+
+.touch .fire {
+  width: 76px;
+  height: 76px;
+}
+
+.touch .touch-pause {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 44px;
+  height: 44px;
+  font-size: 13px;
+}
+
+@media (pointer: coarse) {
+  .touch {
+    display: flex;
+  }
+
+  .hint {
+    display: none;
+  }
+}

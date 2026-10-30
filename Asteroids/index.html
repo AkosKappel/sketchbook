@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Asteroids · SketchBook</title>
+    <meta name="description" content="Vector arcade shooter: steer a drifting ship, split the rocks into smaller ones and survive the waves." />
+    <link rel="icon" href="../shared/favicon.svg" />
+    <link rel="stylesheet" href="../shared/base.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script defer src="../shared/fit-canvas.js"></script>
+    <script defer src="../shared/celebrate.js"></script>
+    <script defer src="app.js"></script>
+  </head>
+  <body class="project">
+    <header class="topbar">
+      <a class="back" href="../">← All projects</a>
+      <h1>Asteroids</h1>
+      <span class="stat">Score <output id="score">0</output></span>
+      <span class="stat">Lives <output id="lives">3</output></span>
+      <span class="stat">Wave <output id="wave">1</output></span>
+      <span class="stat">Best <output id="best">0</output></span>
+      <p class="hint"><kbd>←</kbd><kbd>→</kbd> turn, <kbd>↑</kbd> thrust, <kbd>Space</kbd> fire, <kbd>H</kbd> hyperspace, <kbd>P</kbd> pause</p>
+    </header>
+    <main class="stage">
+      <canvas id="canvas"></canvas>
+      <div class="touch" id="touch">
+        <div class="touch-group">
+          <button type="button" data-control="left" aria-label="Turn left">◀</button>
+          <button type="button" data-control="right" aria-label="Turn right">▶</button>
+          <button type="button" data-control="thrust" aria-label="Thrust">▲</button>
+        </div>
+        <div class="touch-group">
+          <button type="button" class="fire" data-control="fire" aria-label="Fire">●</button>
+        </div>
+        <button type="button" class="touch-pause" id="touch-pause" aria-label="Pause">❚❚</button>
+      </div>
+      <div class="overlay" id="overlay">
+        <h2 id="overlay-title">Asteroids</h2>
+        <p id="overlay-text">Press Space or tap to start</p>
+      </div>
+    </main>
+  </body>
+</html>
