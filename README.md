@@ -2,7 +2,7 @@
 
 A collection of small browser experiments: classic games, simulations, fractals and canvas effects. Most were written while learning web development by following tutorials, then cleaned up, fixed and redesigned in 2026. Minesweeper, 2048, Maze, Sorting, Langton's Ant, Reaction-Diffusion, Mandelbrot, Double Pendulum, Flow Field, Breakout, Connect Four, Blocks, Asteroids and Falling Sand were added in 2026.
 
-Live: https://akoskappel.github.io/sketchbook/
+Live: https://sketchbook.akoskappel.dev/
 
 | Category | Projects |
 | --- | --- |
